@@ -12,9 +12,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        var et_user_name = findViewById(R.id.editText) as EditText
-        var et_password = findViewById(R.id.editText2) as EditText
-        var btn_submit = findViewById(R.id.button) as Button
+        var et_user_name = findViewById(R.id.textInputEditTextEmail) as EditText
+        var et_password = findViewById(R.id.textInputEditTextPassword) as EditText
+        var btn_submit = findViewById(R.id.appCompatButtonLogin) as Button
 
         btn_submit.setOnClickListener {
             val user_name = et_user_name.text
