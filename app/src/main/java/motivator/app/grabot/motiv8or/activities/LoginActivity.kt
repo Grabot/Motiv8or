@@ -15,6 +15,7 @@ import motivator.app.grabot.motiv8or.sql.DatabaseHelper
 import motivator.app.grabot.motiv8or.support.InputValidation
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
+
     private val activity = this@LoginActivity
 
     private lateinit var nestedScrollView: NestedScrollView
@@ -47,10 +48,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         textViewLinkRegister = findViewById<View>(R.id.textViewLinkRegister) as AppCompatTextView
     }
 
-    override fun onClick(v: View?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     private fun initListeners() {
         appCompatButtonLogin!!.setOnClickListener(this)
         textViewLinkRegister!!.setOnClickListener(this)
@@ -59,6 +56,45 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private fun initObjects() {
         databaseHelper = DatabaseHelper(activity)
         inputValidation = InputValidation(activity)
+    }
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.appCompatButtonLogin -> verifyFromSQLite()
+            R.id.textViewLinkRegister -> {
+                // Navigate to RegisterActivity
+                val intentRegister = Intent(applicationContext, RegisterActivity::class.java)
+                startActivity(intentRegister)
+            }
+        }
+    }
+
+    private fun verifyFromSQLite() {
+
+        if (!inputValidation!!.isInputEditTextFilled(textInputEditTextEmail!!, textInputLayoutEmail!!, getString(R.string.error_message_email))) {
+            return
+        }
+        if (!inputValidation!!.isInputEditTextEmail(textInputEditTextEmail!!, textInputLayoutEmail!!, getString(R.string.error_message_email))) {
+            return
+        }
+        if (!inputValidation!!.isInputEditTextFilled(textInputEditTextPassword!!, textInputLayoutPassword!!, getString(R.string.error_message_email))) {
+            return
+        }
+
+        if (databaseHelper!!.checkIfUserExists(textInputEditTextEmail!!.text.toString().trim { it <= ' ' }, textInputEditTextPassword!!.text.toString().trim { it <= ' ' })) {
+
+
+            val accountsIntent = Intent(activity, UsersListActivity::class.java)
+            accountsIntent.putExtra("EMAIL", textInputEditTextEmail!!.text.toString().trim { it <= ' ' })
+            emptyInputEditText()
+            startActivity(accountsIntent)
+
+
+        } else {
+
+            // Snack Bar to show success message that record is wrong
+            Snackbar.make(nestedScrollView!!, getString(R.string.error_valid_email_password), Snackbar.LENGTH_LONG).show()
+        }
     }
 
     private fun emptyInputEditText() {
