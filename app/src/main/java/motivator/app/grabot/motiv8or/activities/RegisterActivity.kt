@@ -48,7 +48,7 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initViews() {
-        nestedScrollView = findViewById<View>(R.id.nestedScrollView) as NestedScrollView
+        nestedScrollView = findViewById<View>(R.id.nestedScrollViewRegister) as NestedScrollView
         textInputLayoutName = findViewById<View>(R.id.textInputLayoutName) as TextInputLayout
         textInputLayoutEmail = findViewById<View>(R.id.textInputLayoutEmail) as TextInputLayout
         textInputLayoutPassword = findViewById<View>(R.id.textInputLayoutPassword) as TextInputLayout
