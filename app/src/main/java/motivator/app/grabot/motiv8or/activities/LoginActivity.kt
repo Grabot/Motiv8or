@@ -62,7 +62,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         when (v.id) {
             R.id.appCompatButtonLogin -> verifyFromSQLite()
             R.id.textViewLinkRegister -> {
-                // Navigate to RegisterActivity
                 val intentRegister = Intent(applicationContext, RegisterActivity::class.java)
                 startActivity(intentRegister)
             }
@@ -84,10 +83,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         if (databaseHelper!!.checkIfUserExists(textInputEditTextEmail!!.text.toString().trim { it <= ' ' }, textInputEditTextPassword!!.text.toString().trim { it <= ' ' })) {
 
 
-            val accountsIntent = Intent(activity, UsersListActivity::class.java)
-            accountsIntent.putExtra("EMAIL", textInputEditTextEmail!!.text.toString().trim { it <= ' ' })
+            val homeIntent = Intent(activity, HomeActivity::class.java)
+            homeIntent.putExtra("EMAIL", textInputEditTextEmail!!.text.toString().trim { it <= ' ' })
             emptyInputEditText()
-            startActivity(accountsIntent)
+            startActivity(homeIntent)
 
 
         } else {

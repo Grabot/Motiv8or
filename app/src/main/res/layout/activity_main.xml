@@ -26,7 +26,7 @@
                 android:src="@drawable/ic_launcher_foreground"/>
 
         <android.support.v7.widget.AppCompatButton
-                android:id="@+id/appCompatButtonLogin"
+                android:id="@+id/appCompatButtonLoginMain"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
@@ -34,7 +34,7 @@
                 android:text="@string/text_login"/>
 
         <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/textViewCreateAccount"
+                android:id="@+id/textViewCreateAccountMain"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="100dp"
@@ -43,7 +43,7 @@
                 android:textSize="16sp"/>
 
         <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/textViewContinueAsGues"
+                android:id="@+id/textViewContinueAsGuest"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
