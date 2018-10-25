@@ -62,8 +62,8 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initListeners() {
-        appCompatButtonRegister!!.setOnClickListener(this)
-        appCompatTextViewLoginLink!!.setOnClickListener(this)
+        appCompatButtonRegister.setOnClickListener(this)
+        appCompatTextViewLoginLink.setOnClickListener(this)
     }
 
     private fun initObjects() {
@@ -79,51 +79,48 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun postDataToSQLite() {
-        if (!inputValidation!!.isInputEditTextFilled(textInputEditTextName, textInputLayoutName, getString(R.string.error_message_name))) {
+        if (!inputValidation.isInputEditTextFilled(textInputEditTextName, textInputLayoutName, getString(R.string.error_message_name))) {
             return
         }
-        if (!inputValidation!!.isInputEditTextFilled(textInputEditTextEmail, textInputLayoutEmail, getString(R.string.error_message_email))) {
+        if (!inputValidation.isInputEditTextFilled(textInputEditTextEmail, textInputLayoutEmail, getString(R.string.error_message_email))) {
             return
         }
-        if (!inputValidation!!.isInputEditTextEmail(textInputEditTextEmail, textInputLayoutEmail, getString(R.string.error_message_email))) {
+        if (!inputValidation.isInputEditTextEmail(textInputEditTextEmail, textInputLayoutEmail, getString(R.string.error_message_email))) {
             return
         }
-        if (!inputValidation!!.isInputEditTextFilled(textInputEditTextPassword, textInputLayoutPassword, getString(R.string.error_message_password))) {
+        if (!inputValidation.isInputEditTextFilled(textInputEditTextPassword, textInputLayoutPassword, getString(R.string.error_message_password))) {
             return
         }
-        if (!inputValidation!!.isInputEditTextMatches(textInputEditTextPassword, textInputEditTextConfirmPassword,
+        if (!inputValidation.isInputEditTextMatches(textInputEditTextPassword, textInputEditTextConfirmPassword,
                 textInputLayoutConfirmPassword, getString(R.string.error_password_match))) {
             return
         }
 
-        if (!databaseHelper!!.checkIfUserExists(textInputEditTextEmail!!.text.toString().trim())) {
+        if (!databaseHelper.checkIfUserExists(textInputEditTextEmail.text.toString().trim())) {
 
-            var user = User(name = textInputEditTextName!!.text.toString().trim(),
-                email = textInputEditTextEmail!!.text.toString().trim(),
-                password = textInputEditTextPassword!!.text.toString().trim())
+            var user = User(name = textInputEditTextName.text.toString().trim(),
+                email = textInputEditTextEmail.text.toString().trim(),
+                password = textInputEditTextPassword.text.toString().trim())
 
-            databaseHelper!!.addUser(user)
+            databaseHelper.addUser(user)
 
             // Snack Bar to show success message that record saved successfully
-            Snackbar.make(nestedScrollView!!, getString(R.string.success_message), Snackbar.LENGTH_LONG).show()
+            Snackbar.make(nestedScrollView, getString(R.string.success_message), Snackbar.LENGTH_LONG).show()
             emptyInputEditText()
 
 
         } else {
             // Snack Bar to show error message that record already exists
-            Snackbar.make(nestedScrollView!!, getString(R.string.error_email_exists), Snackbar.LENGTH_LONG).show()
+            Snackbar.make(nestedScrollView, getString(R.string.error_email_exists), Snackbar.LENGTH_LONG).show()
         }
 
 
     }
 
-    /**
-     * This method is to empty all input edit text
-     */
     private fun emptyInputEditText() {
-        textInputEditTextName!!.text = null
-        textInputEditTextEmail!!.text = null
-        textInputEditTextPassword!!.text = null
-        textInputEditTextConfirmPassword!!.text = null
+        textInputEditTextName.text = null
+        textInputEditTextEmail.text = null
+        textInputEditTextPassword.text = null
+        textInputEditTextConfirmPassword.text = null
     }
 }

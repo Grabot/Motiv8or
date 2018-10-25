@@ -28,10 +28,6 @@ class UsersRecyclerAdapter(private val listUsers: List<User>) : RecyclerView.Ada
         return listUsers.size
     }
 
-
-    /**
-     * ViewHolder class
-     */
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         var textViewName: AppCompatTextView

@@ -1,5 +1,6 @@
 package motivator.app.grabot.motiv8or.activities
 
+import android.annotation.SuppressLint
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity

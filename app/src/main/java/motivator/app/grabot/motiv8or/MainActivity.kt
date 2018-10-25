@@ -31,9 +31,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initListeners() {
-        appCompatButtonLoginMain!!.setOnClickListener(this)
-        textViewLinkRegisterMain!!.setOnClickListener(this)
-        textViewContinueAsGuest!!.setOnClickListener(this)
+        appCompatButtonLoginMain.setOnClickListener(this)
+        textViewLinkRegisterMain.setOnClickListener(this)
+        textViewContinueAsGuest.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
