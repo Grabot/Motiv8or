@@ -12,6 +12,8 @@ import motivator.app.grabot.motiv8or.activities.RegisterActivity
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
+    private val activity = this@MainActivity
+
     private lateinit var appCompatButtonLoginMain: AppCompatButton
     private lateinit var textViewLinkRegisterMain: AppCompatTextView
     private lateinit var textViewContinueAsGuest : AppCompatTextView
@@ -39,15 +41,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
         when (v.id) {
             R.id.appCompatButtonLoginMain -> {
-                val intentLogin = Intent(applicationContext, LoginActivity::class.java)
+                val intentLogin = Intent(activity, LoginActivity::class.java)
                 startActivity(intentLogin)
             }
             R.id.textViewCreateAccountMain -> {
-                val intentRegister = Intent(applicationContext, RegisterActivity::class.java)
+                val intentRegister = Intent(activity, RegisterActivity::class.java)
                 startActivity(intentRegister)
             }
             R.id.textViewContinueAsGuest -> {
-                val intentHome = Intent(applicationContext, HomeActivity::class.java)
+                val intentHome = Intent(activity, HomeActivity::class.java)
                 startActivity(intentHome)
             }
         }
