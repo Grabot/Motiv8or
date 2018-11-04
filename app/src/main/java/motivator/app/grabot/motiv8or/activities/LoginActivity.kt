@@ -1,8 +1,8 @@
 package motivator.app.grabot.motiv8or.activities
 
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputEditText
 import android.support.design.widget.TextInputLayout
 import android.support.v4.widget.NestedScrollView
@@ -13,6 +13,14 @@ import android.view.View
 import motivator.app.grabot.motiv8or.R
 import motivator.app.grabot.motiv8or.sql.DatabaseHelper
 import motivator.app.grabot.motiv8or.support.InputValidation
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
+import org.json.JSONException
+import org.json.JSONObject
+import android.widget.Toast
+
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -60,7 +68,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.appCompatButtonLogin -> verifyFromSQLite()
+            R.id.appCompatButtonLogin -> verifyUserAndLogin()
             R.id.textViewLinkRegister -> {
                 val intentRegister = Intent(applicationContext, RegisterActivity::class.java)
                 startActivity(intentRegister)
@@ -68,36 +76,77 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun verifyFromSQLite() {
+    private fun verifyUserAndLogin() {
+        val Name = textInputEditTextEmail.text.toString()
+        val Password = textInputEditTextPassword.text.toString()
 
-        if (!inputValidation.isInputEditTextFilled(textInputEditTextEmail, textInputLayoutEmail, getString(R.string.error_message_email))) {
-            return
-        }
-        if (!inputValidation.isInputEditTextEmail(textInputEditTextEmail, textInputLayoutEmail, getString(R.string.error_message_email))) {
-            return
-        }
-        if (!inputValidation.isInputEditTextFilled(textInputEditTextPassword, textInputLayoutPassword, getString(R.string.error_message_email))) {
-            return
-        }
-
-        if (databaseHelper.checkIfUserExists(textInputEditTextEmail.text.toString().trim { it <= ' ' }, textInputEditTextPassword.text.toString().trim { it <= ' ' })) {
-
-
-            val homeIntent = Intent(activity, HomeActivity::class.java)
-            homeIntent.putExtra("EMAIL", textInputEditTextEmail.text.toString().trim { it <= ' ' })
-            emptyInputEditText()
-            startActivity(homeIntent)
-
-
-        } else {
-
-            // Snack Bar to show success message that record is wrong
-            Snackbar.make(nestedScrollView, getString(R.string.error_valid_email_password), Snackbar.LENGTH_LONG).show()
-        }
+        val b = BackGround()
+        b.execute(Name, Password)
     }
 
-    private fun emptyInputEditText() {
-        textInputEditTextEmail.text = null
-        textInputEditTextPassword.text = null
+    internal inner class BackGround : AsyncTask<String, String, String>() {
+        override fun doInBackground(vararg params: String?): String {
+            val name = params[0]
+            val password = params[1]
+
+            try {
+                // 10.0.2.2 is how you can access localhost on the host computer of the emulator
+                // We use the localhost before getting it to work on a real server.
+                val url = URL("http://10.0.2.2/motivate/login.php")
+                val urlParams = "name=$name&password=$password"
+
+                val httpURLConnection = url.openConnection() as HttpURLConnection
+                httpURLConnection.setDoOutput(true)
+
+                val os = httpURLConnection.getOutputStream()
+                os.write(urlParams.toByteArray())
+                os.flush()
+                os.close()
+
+                val input = httpURLConnection.getInputStream()
+
+                val data = input.bufferedReader().readText()
+
+                input.close()
+                httpURLConnection.disconnect()
+
+                return data
+
+            } catch (e: MalformedURLException) {
+                e.printStackTrace()
+                return "Exception: " + e.message
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return "Exception: " + e.message
+            }
+
+        }
+
+        override fun onPostExecute(s: String) {
+            var succes = true
+            var name = ""
+            var password = ""
+            var email = ""
+            try {
+                val root = JSONObject(s)
+                val user_data = root.getJSONObject("user_data")
+                name = user_data.getString("name")
+                password = user_data.getString("password")
+                email = user_data.getString("email")
+            } catch (e: JSONException) {
+                e.printStackTrace()
+                succes = false
+            }
+
+            if (succes) {
+                val intentLogin = Intent(applicationContext, HomeActivity::class.java)
+                intentLogin.putExtra("name", name)
+                intentLogin.putExtra("password", password)
+                intentLogin.putExtra("email", email)
+                startActivity(intentLogin)
+            } else {
+                Toast.makeText(this@LoginActivity, "Username or password was incorrect!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

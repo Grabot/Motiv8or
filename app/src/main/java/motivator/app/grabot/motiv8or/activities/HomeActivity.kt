@@ -3,6 +3,7 @@ package motivator.app.grabot.motiv8or.activities
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.ListView
+import android.widget.Toast
 import motivator.app.grabot.motiv8or.R
 import motivator.app.grabot.motiv8or.adapters.CustomAdapter
 import motivator.app.grabot.motiv8or.data.Model
@@ -38,12 +39,19 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        val name = getIntent().getStringExtra("name")
+        val password = getIntent().getStringExtra("password")
+        val email = getIntent().getStringExtra("email")
+
         lv = findViewById(R.id.lv) as ListView
 
         modelArrayList = model
         customAdapter = CustomAdapter(this)
         lv!!.adapter = customAdapter
 
+        Toast.makeText(this@HomeActivity, "Welcome " + name + " your password was " + password +
+                ", don't tell anyone!\nWe're telling you so we don't have to send an email to " + email +
+                " if you do forget it.", Toast.LENGTH_SHORT).show()
     }
 
     companion object {
