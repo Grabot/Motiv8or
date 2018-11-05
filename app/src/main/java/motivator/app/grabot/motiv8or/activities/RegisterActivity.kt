@@ -1,7 +1,7 @@
 package motivator.app.grabot.motiv8or.activities
 
+import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TextInputEditText
 import android.support.design.widget.TextInputLayout
 import android.support.v4.widget.NestedScrollView
@@ -10,9 +10,17 @@ import android.support.v7.widget.AppCompatButton
 import android.support.v7.widget.AppCompatTextView
 import android.view.View
 import motivator.app.grabot.motiv8or.R
-import motivator.app.grabot.motiv8or.data.User
 import motivator.app.grabot.motiv8or.sql.DatabaseHelper
 import motivator.app.grabot.motiv8or.support.InputValidation
+import android.widget.Toast
+import android.os.AsyncTask
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
+
 
 class RegisterActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -73,54 +81,79 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.appCompatButtonRegister -> postDataToSQLite()
+            R.id.appCompatButtonRegister -> registerUser()
             R.id.appCompatTextViewLoginLink -> finish()
         }
     }
 
-    private fun postDataToSQLite() {
-        if (!inputValidation.isInputEditTextFilled(textInputEditTextName, textInputLayoutName, getString(R.string.error_message_name))) {
-            return
-        }
-        if (!inputValidation.isInputEditTextFilled(textInputEditTextEmail, textInputLayoutEmail, getString(R.string.error_message_email))) {
-            return
-        }
-        if (!inputValidation.isInputEditTextEmail(textInputEditTextEmail, textInputLayoutEmail, getString(R.string.error_message_email))) {
-            return
-        }
-        if (!inputValidation.isInputEditTextFilled(textInputEditTextPassword, textInputLayoutPassword, getString(R.string.error_message_password))) {
-            return
-        }
-        if (!inputValidation.isInputEditTextMatches(textInputEditTextPassword, textInputEditTextConfirmPassword,
-                textInputLayoutConfirmPassword, getString(R.string.error_password_match))) {
-            return
-        }
+    private fun registerUser() {
+        val Id = "1"
+        val Name = textInputEditTextEmail.text.toString()
+        val Password = textInputEditTextPassword.text.toString()
+        val Email = textInputEditTextEmail.text.toString()
 
-        if (!databaseHelper.checkIfUserExists(textInputEditTextEmail.text.toString().trim())) {
-
-            var user = User(name = textInputEditTextName.text.toString().trim(),
-                email = textInputEditTextEmail.text.toString().trim(),
-                password = textInputEditTextPassword.text.toString().trim())
-
-            databaseHelper.addUser(user)
-
-            // Snack Bar to show success message that record saved successfully
-            Snackbar.make(nestedScrollView, getString(R.string.success_message), Snackbar.LENGTH_LONG).show()
-            emptyInputEditText()
-
-
-        } else {
-            // Snack Bar to show error message that record already exists
-            Snackbar.make(nestedScrollView, getString(R.string.error_email_exists), Snackbar.LENGTH_LONG).show()
-        }
-
-
+        val b = BackGround()
+        b.execute(Id, Name, Password, Email)
     }
 
-    private fun emptyInputEditText() {
-        textInputEditTextName.text = null
-        textInputEditTextEmail.text = null
-        textInputEditTextPassword.text = null
-        textInputEditTextConfirmPassword.text = null
+    internal inner class BackGround : AsyncTask<String, String, String>() {
+
+        override fun doInBackground(vararg params: String): String {
+            val user_id = params[0]
+            val name = params[1]
+            val password = params[2]
+            val email = params[3]
+
+            try {
+                val url = URL("http://10.0.2.2/motivate/register.php")
+                val urlParams = "user_id=$user_id&name=$name&password=$password&email=$email"
+
+                val httpURLConnection = url.openConnection() as HttpURLConnection
+                httpURLConnection.doOutput = true
+
+                val os = httpURLConnection.outputStream 
+                os.write(urlParams.toByteArray())
+                os.flush()
+                os.close()
+
+                val input = httpURLConnection.inputStream
+
+                val data = input.bufferedReader().readText()
+
+                input.close()
+                httpURLConnection.disconnect()
+
+                return data
+
+            } catch (e: MalformedURLException) {
+                e.printStackTrace()
+                return "Exception: " + e.message
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return "Exception: " + e.message
+            }
+        }
+
+        override fun onPostExecute(s: String) {
+            var succes = true
+            try {
+                val root = JSONObject(s)
+                val user_data = root.getJSONObject("user_data")
+                var result = user_data.getString("result")
+                if (result == "failed") {
+                    succes = false
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+                succes = false
+            }
+
+            if (succes) {
+                val intentLogin = Intent(applicationContext, LoginActivity::class.java)
+                startActivity(intentLogin)
+            } else {
+                Toast.makeText(this@RegisterActivity, "Are you sure lol? this didn't work!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

@@ -96,14 +96,14 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                 val urlParams = "name=$name&password=$password"
 
                 val httpURLConnection = url.openConnection() as HttpURLConnection
-                httpURLConnection.setDoOutput(true)
+                httpURLConnection.doOutput = true
 
-                val os = httpURLConnection.getOutputStream()
+                val os = httpURLConnection.outputStream
                 os.write(urlParams.toByteArray())
                 os.flush()
                 os.close()
 
-                val input = httpURLConnection.getInputStream()
+                val input = httpURLConnection.inputStream
 
                 val data = input.bufferedReader().readText()
 
