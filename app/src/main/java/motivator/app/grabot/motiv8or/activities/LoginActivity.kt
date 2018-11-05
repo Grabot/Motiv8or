@@ -11,7 +11,6 @@ import android.support.v7.widget.AppCompatButton
 import android.support.v7.widget.AppCompatTextView
 import android.view.View
 import motivator.app.grabot.motiv8or.R
-import motivator.app.grabot.motiv8or.sql.DatabaseHelper
 import motivator.app.grabot.motiv8or.support.InputValidation
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -34,7 +33,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var appCompatButtonLogin: AppCompatButton
     private lateinit var textViewLinkRegister: AppCompatTextView
     private lateinit var inputValidation: InputValidation
-    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +60,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initObjects() {
-        databaseHelper = DatabaseHelper(activity)
         inputValidation = InputValidation(activity)
     }
 

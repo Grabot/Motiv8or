@@ -10,7 +10,6 @@ import android.support.v7.widget.AppCompatButton
 import android.support.v7.widget.AppCompatTextView
 import android.view.View
 import motivator.app.grabot.motiv8or.R
-import motivator.app.grabot.motiv8or.sql.DatabaseHelper
 import motivator.app.grabot.motiv8or.support.InputValidation
 import android.widget.Toast
 import android.os.AsyncTask
@@ -42,7 +41,6 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var appCompatTextViewLoginLink: AppCompatTextView
 
     private lateinit var inputValidation: InputValidation
-    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +74,6 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initObjects() {
         inputValidation = InputValidation(activity)
-        databaseHelper = DatabaseHelper(activity)
     }
 
     override fun onClick(v: View) {
