@@ -84,26 +84,24 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun registerUser() {
-        val Id = "1"
-        val Name = textInputEditTextEmail.text.toString()
+        val Name = textInputEditTextName.text.toString()
         val Password = textInputEditTextPassword.text.toString()
         val Email = textInputEditTextEmail.text.toString()
 
         val b = BackGround()
-        b.execute(Id, Name, Password, Email)
+        b.execute(Name, Password, Email)
     }
 
     internal inner class BackGround : AsyncTask<String, String, String>() {
 
         override fun doInBackground(vararg params: String): String {
-            val user_id = params[0]
-            val name = params[1]
-            val password = params[2]
-            val email = params[3]
+            val name = params[0]
+            val password = params[1]
+            val email = params[2]
 
             try {
                 val url = URL("http://10.0.2.2/motivate/register.php")
-                val urlParams = "user_id=$user_id&name=$name&password=$password&email=$email"
+                val urlParams = "name=$name&password=$password&email=$email"
 
                 val httpURLConnection = url.openConnection() as HttpURLConnection
                 httpURLConnection.doOutput = true
