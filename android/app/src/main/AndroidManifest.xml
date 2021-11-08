@@ -41,12 +41,5 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <service
-            android:name="motiv8tor.nl.awesome_notifications.services.ForegroundService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="microphone|mediaPlayback"
-            android:stopWithTask="true"></service>
     </application>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 </manifest>
