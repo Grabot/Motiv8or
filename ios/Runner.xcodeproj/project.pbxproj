@@ -39,7 +39,7 @@
 		05380B1F25F5C438001D5D0A /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		05380B2325F5C441001D5D0A /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		05865CAC264DAB890057AE97 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		05B7232E2724599300D18725 /* res_morph_power_rangers.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; name = res_morph_power_rangers.aiff; path = ../../../../../../Downloads/res_morph_power_rangers.aiff; sourceTree = "<group>"; };
+		05B7232E2724599300D18725 /* res_morph_power_rangers.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; name = res_morph_power_rangers.aiff; path = Runner/res_morph_power_rangers.aiff; sourceTree = "<group>"; };
 		05C0EE5025F2DA0100DC0E72 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		05C0EE5225F2DA0100DC0E72 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
 		05C0EE8525F2DF0200DC0E72 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
