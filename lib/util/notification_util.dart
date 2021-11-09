@@ -53,10 +53,10 @@ Future<bool> requestPermissionToSendNotifications(BuildContext context) async {
   return isAllowed;
 }
 
-Future<bool> redirectToPermissionsPage() async {
-  await AwesomeNotifications().showNotificationConfigPage();
-  return await AwesomeNotifications().isNotificationAllowed();
-}
+// Future<bool> redirectToPermissionsPage() async {
+//   await AwesomeNotifications().showNotificationConfigPage();
+//   return await AwesomeNotifications().isNotificationAllowed();
+// }
 
 Future<void> showCustomSoundNotification(int id) async {
   await AwesomeNotifications().createNotification(
@@ -92,8 +92,7 @@ Future<void> showNotificationAtScheduleCron(
             ' utc)',
         notificationLayout: NotificationLayout.BigPicture,
         bigPicture: 'asset://assets/images/delivery.jpeg',
-        payload: {'uuid': 'uuid-test'},
-        autoDismissable: false,
+        payload: {'uuid': 'uuid-test'}
       ),
       schedule: NotificationCalendar.fromDate(date: scheduleTime));
 }

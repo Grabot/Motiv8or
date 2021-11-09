@@ -308,14 +308,14 @@ class _HomePageState extends State<HomePage> {
                       })
                 )
             ),
-            SimpleButton('Open notifications permission page',
-                onPressed: () => redirectToPermissionsPage().then(
-                    (isAllowed) =>
-                      setState(() {
-                        notificationsAllowed = isAllowed;
-                      })
-                )
-            ),
+            // SimpleButton('Open notifications permission page',
+            //     onPressed: () => redirectToPermissionsPage().then(
+            //         (isAllowed) =>
+            //           setState(() {
+            //             notificationsAllowed = isAllowed;
+            //           })
+            //     )
+            // ),
             SimpleButton('Show notification with custom sound',
                 onPressed: () {
                   showCustomSoundNotification(6);
