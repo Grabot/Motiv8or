@@ -162,8 +162,8 @@ void main() async {
 
   // Uncomment those lines after activate google services inside example/android/build.gradle
   // Create the initialization Future outside of `build`:
-  //FirebaseApp firebaseApp = await Firebase.initializeApp();
-  //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseApp firebaseApp = await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(App());
 }

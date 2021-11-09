@@ -4,10 +4,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:motiv8tor/common_widgets/led_light.dart';
-import 'package:motiv8tor/common_widgets/service_control_panel.dart';
 import 'package:motiv8tor/common_widgets/simple_button.dart';
 import 'package:motiv8tor/util/notification_util.dart';
+import 'package:motiv8tor/util/socket_services.dart';
 import 'package:numberpicker/numberpicker.dart';
+
+import '../constants.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -24,6 +26,9 @@ class _HomePageState extends State<HomePage> {
   bool notificationsAllowed = false;
 
   String packageName = 'motiv8tor.nl.awesome_notifications_example';
+  String testString1 = "";
+  String testString2 = "debug string 2";
+  String testString3 = "debug string 3";
 
   Future<DateTime?> pickScheduleDate(BuildContext context,
       {required bool isUtc}) async {
@@ -90,9 +95,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  var socket;
+
   @override
   void initState() {
-    super.initState();
+    socket = SocketServices();
+    socket.setScreen(this);
+    socket.initialize();
+
+    initializeFirebaseService();
 
     AwesomeNotifications().createdStream.listen((receivedNotification) {
       String? createdSourceText =
@@ -124,6 +135,27 @@ class _HomePageState extends State<HomePage> {
         // isAllowed = await requestPermissionToSendNotifications(context);
       }
     });
+
+    testString1 = "socket is NOT connected";
+    if (socket.isConnected()) {
+      testString1 = "socket is connected";
+    }
+
+    setState(() {
+    });
+    super.initState();
+  }
+
+  update() {
+    if (mounted) {
+      print("going to update");
+      testString1 = "socket is NOT connected";
+      if (socket.isConnected()) {
+        testString1 = "socket is connected";
+      }
+      setState(() {
+      });
+    }
   }
 
   @override
@@ -138,9 +170,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> initializeFirebaseService() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
+    print("we are going to initialize the firebase service here");
     String firebaseAppToken = await messaging.getToken(
           // https://stackoverflow.com/questions/54996206/firebase-cloud-messaging-where-to-find-public-vapid-key
-          vapidKey: '',
+          vapidKey: vapidKey,
         ) ??
         '';
 
@@ -202,6 +235,8 @@ class _HomePageState extends State<HomePage> {
     MediaQueryData mediaQuery = MediaQuery.of(context);
     ThemeData themeData = Theme.of(context);
 
+    bool status = !StringUtils.isNullOrEmpty(_firebaseAppToken);
+
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -219,11 +254,32 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                ServiceControlPanel('Firebase',
-                    !StringUtils.isNullOrEmpty(_firebaseAppToken), themeData,
-                    onPressed: () => Navigator.pushNamed(
-                        context, PAGE_FIREBASE_TESTS,
-                        arguments: _firebaseAppToken)),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                              style: TextStyle(color: Colors.black87),
+                              text: 'Firebase status:\n',
+                              children: [
+                                TextSpan(
+                                    style: TextStyle(
+                                        color: status
+                                            ? Colors.green
+                                            : Colors.redAccent),
+                                    text: (status ? 'Available' : 'Unavailable') +
+                                        '\n'),
+                                WidgetSpan(child: LedLight(status))
+                              ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
             Text(
@@ -261,7 +317,9 @@ class _HomePageState extends State<HomePage> {
                 )
             ),
             SimpleButton('Show notification with custom sound',
-                onPressed: () => showCustomSoundNotification(6)),
+                onPressed: () {
+                  showCustomSoundNotification(6);
+                }),
             SimpleButton('Cancel notification',
                 backgroundColor: Colors.red,
                 labelColor: Colors.white,
@@ -282,10 +340,50 @@ class _HomePageState extends State<HomePage> {
                 showNotificationAtScheduleCron(pickedDate);
               }
             }),
-            SimpleButton('Extra button for testing other stuff',
+            SizedBox(
+              height:50
+            ),
+            Text(
+              "eigen dubug spull"
+            ),
+            SimpleButton('make connection via socket',
               onPressed: () async {
-                print("pressed your own special button");
-              })
+                socket = SocketServices();
+                socket.setScreen(this);
+                socket.initialize();
+                print("pressed the socket connection button");
+              }),
+            SimpleButton('check if socket connection is still live',
+                onPressed: () async {
+                  print("pressed the socket check button");
+                }),
+            SimpleButton('test socket connection, join room 1',
+                onPressed: () async {
+                  print("pressed the join room 1 button");
+                }),
+            SimpleButton('test socket connection, leave room 1',
+                onPressed: () async {
+                  print("pressed the lave room 1 button");
+                }),
+            SimpleButton('Send random socket message',
+                onPressed: () async {
+                  print("pressed the send random socket message");
+                }),
+            SimpleButton('update state',
+                onPressed: () async {
+                  this.update();
+                  setState(() {
+                  });
+                }),
+            Text(
+              "debug 1: $testString1"
+            ),
+            Text(
+                "debug 2: $testString2"
+            ),
+            Text(
+                "debug 3: $testString3"
+            )
           ],
         ));
   }
