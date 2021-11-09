@@ -1,5 +1,5 @@
 name: motiv8tor
-version: 0.1.0+1
+version: 1.0.0+1
 description: An app to motivate you
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -20,7 +20,7 @@ dependencies:
   firebase_messaging: ^11.1.0
   numberpicker: ^2.1.1
   socket_io_client: ^2.0.0-beta.4-nullsafety.0
-  awesome_notifications: ^0.0.3
+  awesome_notifications: ^0.6.16
 
 dev_dependencies:
   flutter_test:
