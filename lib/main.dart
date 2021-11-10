@@ -85,7 +85,7 @@ void main() async {
           channelName: "Custom sound notifications",
           channelDescription: "Notifications with custom sound",
           playSound: true,
-          soundSource: 'resource://raw/res_morph_power_rangers',
+          soundSource: 'resource://raw/res_brodio',
           defaultColor: Colors.red,
           ledColor: Colors.red,
           vibrationPattern: lowVibrationPattern),
