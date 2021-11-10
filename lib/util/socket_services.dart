@@ -44,7 +44,33 @@ class SocketServices {
     return socket!.connected;
   }
 
-  sendMessage(String message, String room, String roomSolo) {
+  leaveRoom(String room) {
+    if (socket!.connected) {
+      // The room could be for a chat
+      // roomSolo is the room for this phone specifically
+      socket!.emit(
+        "leave",
+        {
+          "room": room,
+        },
+      );
+    }
+  }
+
+  joinRoom(String room) {
+    if (socket!.connected) {
+      // The room could be for a chat
+      // roomSolo is the room for this phone specifically
+      socket!.emit(
+        "join",
+        {
+          "room": room,
+        },
+      );
+    }
+  }
+
+  sendMessage(String message, String room) {
     if (socket!.connected) {
       // The room could be for a chat
       // roomSolo is the room for this phone specifically
@@ -54,7 +80,6 @@ class SocketServices {
           "id": 1.toString(),
           "message": message,
           "room": room,
-          "room_solo": roomSolo
         },
       );
     }

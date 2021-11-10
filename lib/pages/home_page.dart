@@ -25,9 +25,6 @@ class _HomePageState extends State<HomePage> {
 
   bool notificationsAllowed = false;
 
-  String testString1 = "";
-  String testString2 = "debug string 2";
-  String testString3 = "debug string 3";
 
   Future<DateTime?> pickScheduleDate(BuildContext context,
       {required bool isUtc}) async {
@@ -355,34 +352,38 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Text(socket.isConnected() ? 'Connected' : 'Not connected',
                           style: TextStyle(
-                              color: notificationsAllowed
+                              color: socket.isConnected()
                                   ? Colors.green
                                   : Colors.red)),
                       LedLight(socket.isConnected())
                     ],
                   )
                 ]),
-            SimpleButton('test socket connection, join room 1',
+            SimpleButton('test socket connection, join solo room (bro home)',
+                onPressed: () async {
+                  print("pressed the join solo room button");
+                  socket.joinRoom("room_1");
+                }),
+            SimpleButton('test socket connection, join room 1 (a chat)',
                 onPressed: () async {
                   print("pressed the join room 1 button");
+                  socket.joinRoom("1_2");
                 }),
-            SimpleButton('test socket connection, leave room 1',
+            SimpleButton('test socket connection, leave solo room (bro home)',
                 onPressed: () async {
-                  print("pressed the lave room 1 button");
+                  print("pressed the leave solo room button");
+                  socket.leaveRoom("room_1");
                 }),
-            SimpleButton('Send random socket message',
+            SimpleButton('test socket connection, leave room 1 (a chat)',
                 onPressed: () async {
-                  print("pressed the send random socket message");
+                  print("pressed the leave room 1 button");
+                  socket.leaveRoom("1_2");
                 }),
-            Text(
-              "debug 1: $testString1"
-            ),
-            Text(
-                "debug 2: $testString2"
-            ),
-            Text(
-                "debug 3: $testString3"
-            )
+            SimpleButton('test socket connection, send message in chat',
+                onPressed: () async {
+                  print("pressed the send message button");
+                  socket.sendMessage("test", "1_2");
+                }),
           ],
         ));
   }
