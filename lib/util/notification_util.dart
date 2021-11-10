@@ -17,11 +17,6 @@ Future<bool> requestPermissionToSendNotifications(BuildContext context) async {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                'assets/images/animated-bell.gif',
-                height: 200,
-                fit: BoxFit.fitWidth,
-              ),
               Text(
                 'Allow Awesome Notifications to send you beautiful notifications!',
                 textAlign: TextAlign.center,
