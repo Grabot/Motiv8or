@@ -31,8 +31,6 @@ class SocketServices {
     });
     socket!.on('message_event', (data) => print(data));
     socket!.open();
-    print("quick socket test");
-    print(socket!.connected);
   }
 
   setScreen(var screen) {
@@ -40,12 +38,25 @@ class SocketServices {
   }
 
   isConnected() {
-    print("another quick socket test");
     if (socket == null) {
-      print("WAAT?!");
       return false;
     }
-    print(socket!.connected);
     return socket!.connected;
+  }
+
+  sendMessage(String message, String room, String roomSolo) {
+    if (socket!.connected) {
+      // The room could be for a chat
+      // roomSolo is the room for this phone specifically
+      socket!.emit(
+        "message",
+        {
+          "id": 1.toString(),
+          "message": message,
+          "room": room,
+          "room_solo": roomSolo
+        },
+      );
+    }
   }
 }

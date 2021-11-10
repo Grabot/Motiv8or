@@ -25,7 +25,6 @@ class _HomePageState extends State<HomePage> {
 
   bool notificationsAllowed = false;
 
-  String packageName = 'motiv8tor.nl.awesome_notifications_example';
   String testString1 = "";
   String testString2 = "debug string 2";
   String testString3 = "debug string 3";
@@ -136,11 +135,6 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
-    testString1 = "socket is NOT connected";
-    if (socket.isConnected()) {
-      testString1 = "socket is connected";
-    }
-
     setState(() {
     });
     super.initState();
@@ -148,11 +142,6 @@ class _HomePageState extends State<HomePage> {
 
   update() {
     if (mounted) {
-      print("going to update");
-      testString1 = "socket is NOT connected";
-      if (socket.isConnected()) {
-        testString1 = "socket is connected";
-      }
       setState(() {
       });
     }
@@ -351,12 +340,28 @@ class _HomePageState extends State<HomePage> {
                 socket = SocketServices();
                 socket.setScreen(this);
                 socket.initialize();
+                setState(() {
+                });
                 print("pressed the socket connection button");
               }),
-            SimpleButton('check if socket connection is still live',
-                onPressed: () async {
-                  print("pressed the socket check button");
-                }),
+            Text(
+              'Socket connection alive?',
+              textAlign: TextAlign.center,
+            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Column(
+                    children: [
+                      Text(socket.isConnected() ? 'Connected' : 'Not connected',
+                          style: TextStyle(
+                              color: notificationsAllowed
+                                  ? Colors.green
+                                  : Colors.red)),
+                      LedLight(socket.isConnected())
+                    ],
+                  )
+                ]),
             SimpleButton('test socket connection, join room 1',
                 onPressed: () async {
                   print("pressed the join room 1 button");
@@ -368,12 +373,6 @@ class _HomePageState extends State<HomePage> {
             SimpleButton('Send random socket message',
                 onPressed: () async {
                   print("pressed the send random socket message");
-                }),
-            SimpleButton('update state',
-                onPressed: () async {
-                  this.update();
-                  setState(() {
-                  });
                 }),
             Text(
               "debug 1: $testString1"

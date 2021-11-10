@@ -1,6 +1,6 @@
 {
-    "name": "example",
-    "short_name": "example",
+    "name": "motiv8tor",
+    "short_name": "motiv8tor",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
