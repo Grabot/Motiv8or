@@ -5,6 +5,7 @@ import 'package:motiv8tor/common_widgets/simple_button.dart';
 import 'package:motiv8tor/pages/different_page.dart';
 import 'package:motiv8tor/util/notification_service.dart';
 import 'package:motiv8tor/util/notification_util.dart';
+import 'package:motiv8tor/util/shared.dart';
 import 'package:motiv8tor/util/socket_services.dart';
 import 'package:numberpicker/numberpicker.dart';
 
@@ -305,6 +306,14 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 20,
                     color: Colors.black
                 )),
+            SimpleButton('set test string shared preferencees',
+                onPressed: () async {
+                  await HelperFunction.setTestString("test string was set");
+                }),
+            SimpleButton('empty test string',
+                onPressed: () async {
+                  await HelperFunction.setTestString("");
+                }),
           ],
         ));
   }

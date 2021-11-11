@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:motiv8tor/pages/home_page.dart';
 import 'package:motiv8tor/services/debug.dart';
+import 'package:motiv8tor/util/shared.dart';
 import 'package:motiv8tor/util/socket_services.dart';
 
 void main() async {
@@ -184,12 +185,19 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (socket.isConnected()) {
     sendString = "SOCKET!   " + sendString;
   }
-  debug.debugPost(sendString).then((val) {
-    if (val) {
-      print("we have successfully send an update");
+  HelperFunction.getTestString().then((val) {
+    if (val == null || val == "") {
+      sendString = "no test string!   " + sendString;
     } else {
-      print("sending a debug post FAILED!");
+      sendString = val + ":   " + sendString;
     }
+    debug.debugPost(sendString).then((val) {
+      if (val) {
+        print("we have successfully send an update");
+      } else {
+        print("sending a debug post FAILED!");
+      }
+    });
   });
 }
 
