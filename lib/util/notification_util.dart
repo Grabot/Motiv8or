@@ -1,8 +1,10 @@
+
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart' as Utils
     show DateUtils;
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 Future<bool> requestPermissionToSendNotifications(BuildContext context) async {
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
@@ -48,11 +50,6 @@ Future<bool> requestPermissionToSendNotifications(BuildContext context) async {
   return isAllowed;
 }
 
-// Future<bool> redirectToPermissionsPage() async {
-//   await AwesomeNotifications().showNotificationConfigPage();
-//   return await AwesomeNotifications().isNotificationAllowed();
-// }
-
 Future<void> showCustomSoundNotification(int id) async {
   await AwesomeNotifications().createNotification(
       content: NotificationContent(
@@ -89,3 +86,28 @@ Future<void> showNotificationAtScheduleCron(
       ),
       schedule: NotificationCalendar.fromDate(date: scheduleTime));
 }
+
+
+initializeNotifications(BuildContext context) async {
+
+
+  AwesomeNotifications().createdStream.listen((receivedNotification) {
+    String? createdSourceText =
+    AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
+    Fluttertoast.showToast(msg: '$createdSourceText notification created');
+  });
+
+  AwesomeNotifications().displayedStream.listen((receivedNotification) {
+    String? createdSourceText =
+    AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
+    Fluttertoast.showToast(msg: '$createdSourceText notification displayed');
+  });
+
+  AwesomeNotifications().dismissedStream.listen((receivedAction) {
+    String? dismissedSourceText = AssertUtils.toSimpleEnumString(
+        receivedAction.dismissedLifeCycle);
+    Fluttertoast.showToast(
+        msg: 'Notification dismissed on $dismissedSourceText');
+  });
+}
+

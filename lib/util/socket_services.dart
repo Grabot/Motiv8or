@@ -22,14 +22,16 @@ class SocketServices {
     });
     socket!.onConnect((_) {
       socket!.emit('message_event', 'Connected, ms server!');
-      if (this.screen != null) {
-        this.screen.update();
-      }
+      this.screen!.update();
     });
     socket!.onDisconnect((_) {
       socket!.emit('message_event', 'sorry ms server, disconnected!');
+      this.screen!.update();
     });
-    socket!.on('message_event', (data) => print(data));
+    socket!.on('message_event', (data) {
+      print(data);
+      this.screen.updateDebugString(data);
+    });
     socket!.open();
   }
 
@@ -57,10 +59,31 @@ class SocketServices {
     }
   }
 
-  joinRoom(String room) {
+  joinRoomSolo() {
     if (socket!.connected) {
-      // The room could be for a chat
+      String room = "room_1";
       // roomSolo is the room for this phone specifically
+      // We will activate the listening for the room responses from the server
+      socket!.on('message_event_send_solo', (data) =>
+          this.screen.messageReceivedSolo(data));
+
+      socket!.emit(
+        "join",
+        {
+          "room": room,
+        },
+      );
+    }
+  }
+
+  joinRoomChat() {
+    if (socket!.connected) {
+      String room = "1_2";
+      // The room could be for a chat
+      // We will activate the listening for the room responses from the server
+      socket!.on('message_event_send', (data) =>
+          this.screen.messageReceivedChat(data));
+
       socket!.emit(
         "join",
         {
@@ -79,6 +102,35 @@ class SocketServices {
         {
           "id": 1.toString(),
           "message": message,
+          "room": room,
+        },
+      );
+    }
+  }
+
+  sendMessageWithDelay(String message, String room) {
+    if (socket!.connected) {
+      // The room could be for a chat
+      // roomSolo is the room for this phone specifically
+      socket!.emit(
+        "message_with_delay",
+        {
+          "id": 1.toString(),
+          "message": message,
+          "room": room,
+        },
+      );
+    }
+  }
+
+  sendRegistrationId(String registrationId, String room) {
+    if (socket!.connected) {
+      // The room could be for a chat
+      // roomSolo is the room for this phone specifically
+      socket!.emit(
+        "set_registration",
+        {
+          "registration_id": registrationId,
           "room": room,
         },
       );

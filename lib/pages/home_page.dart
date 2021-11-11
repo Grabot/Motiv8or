@@ -1,15 +1,12 @@
-import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart' hide DateUtils;
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:motiv8tor/common_widgets/led_light.dart';
 import 'package:motiv8tor/common_widgets/simple_button.dart';
+import 'package:motiv8tor/pages/different_page.dart';
+import 'package:motiv8tor/util/notification_service.dart';
 import 'package:motiv8tor/util/notification_util.dart';
 import 'package:motiv8tor/util/socket_services.dart';
 import 'package:numberpicker/numberpicker.dart';
-
-import '../constants.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -19,12 +16,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _firebaseAppToken = '';
-  //String _oneSignalToken = '';
 
   bool delayLEDTests = false;
 
   bool notificationsAllowed = false;
 
+  var socket;
+  var notify;
+
+  String debugString = "";
 
   Future<DateTime?> pickScheduleDate(BuildContext context,
       {required bool isUtc}) async {
@@ -91,49 +91,25 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  var socket;
-
   @override
   void initState() {
     socket = SocketServices();
     socket.setScreen(this);
     socket.initialize();
 
-    initializeFirebaseService();
+    notify = NotificationService();
+    notify.setScreen(this);
+    notify.initialize();
 
-    AwesomeNotifications().createdStream.listen((receivedNotification) {
-      String? createdSourceText =
-          AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
-      Fluttertoast.showToast(msg: '$createdSourceText notification created');
-    });
-
-    AwesomeNotifications().displayedStream.listen((receivedNotification) {
-      String? createdSourceText =
-          AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
-      Fluttertoast.showToast(msg: '$createdSourceText notification displayed');
-    });
-
-    AwesomeNotifications().dismissedStream.listen((receivedAction) {
-      String? dismissedSourceText = AssertUtils.toSimpleEnumString(
-          receivedAction.dismissedLifeCycle);
-      Fluttertoast.showToast(
-          msg: 'Notification dismissed on $dismissedSourceText');
-    });
+    _firebaseAppToken = "";
 
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
       print("awesome notification are allowed? $isAllowed");
       setState(() {
         notificationsAllowed = isAllowed;
       });
-
-      if (!isAllowed) {
-        // Just ask on app open?
-        // isAllowed = await requestPermissionToSendNotifications(context);
-      }
     });
 
-    setState(() {
-    });
     super.initState();
   }
 
@@ -152,77 +128,8 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initializeFirebaseService() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    print("we are going to initialize the firebase service here");
-    String firebaseAppToken = await messaging.getToken(
-          // https://stackoverflow.com/questions/54996206/firebase-cloud-messaging-where-to-find-public-vapid-key
-          vapidKey: vapidKey,
-        ) ??
-        '';
-
-    if (StringUtils.isNullOrEmpty(firebaseAppToken,
-        considerWhiteSpaceAsEmpty: true)) return;
-
-    if (!mounted) {
-      _firebaseAppToken = firebaseAppToken;
-    } else {
-      setState(() {
-        _firebaseAppToken = firebaseAppToken;
-      });
-    }
-
-    print('Firebase token: $firebaseAppToken');
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
-
-      if (
-          // This step (if condition) is only necessary if you pretend to use the
-          // test page inside console.firebase.google.com
-          !StringUtils.isNullOrEmpty(message.notification?.title,
-                  considerWhiteSpaceAsEmpty: true) ||
-              !StringUtils.isNullOrEmpty(message.notification?.body,
-                  considerWhiteSpaceAsEmpty: true)) {
-        print('Message also contained a notification: ${message.notification}');
-
-        String? imageUrl;
-        imageUrl ??= message.notification!.android?.imageUrl;
-        imageUrl ??= message.notification!.apple?.imageUrl;
-
-        // https://pub.dev/packages/awesome_notifications#notification-types-values-and-defaults
-        Map<String, dynamic> notificationAdapter = {
-          NOTIFICATION_CONTENT: {
-            NOTIFICATION_ID: Random().nextInt(2147483647),
-            NOTIFICATION_CHANNEL_KEY: 'basic_channel',
-            NOTIFICATION_TITLE: message.notification!.title,
-            NOTIFICATION_BODY: message.notification!.body,
-            NOTIFICATION_LAYOUT:
-                StringUtils.isNullOrEmpty(imageUrl) ? 'Default' : 'BigPicture',
-            NOTIFICATION_BIG_PICTURE: imageUrl
-          }
-        };
-
-        AwesomeNotifications()
-            .createNotificationFromJsonData(notificationAdapter);
-      } else {
-        AwesomeNotifications().createNotificationFromJsonData(message.data);
-      }
-    });
-  }
-
-  String PAGE_FIREBASE_TESTS = '/firebase-tests';
-
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQuery = MediaQuery.of(context);
-    ThemeData themeData = Theme.of(context);
-
-    bool status = !StringUtils.isNullOrEmpty(_firebaseAppToken);
-
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -254,12 +161,12 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 TextSpan(
                                     style: TextStyle(
-                                        color: status
+                                        color: !StringUtils.isNullOrEmpty(_firebaseAppToken)
                                             ? Colors.green
                                             : Colors.redAccent),
-                                    text: (status ? 'Available' : 'Unavailable') +
+                                    text: (!StringUtils.isNullOrEmpty(_firebaseAppToken) ? 'Available' : 'Unavailable') +
                                         '\n'),
-                                WidgetSpan(child: LedLight(status))
+                                WidgetSpan(child: LedLight(!StringUtils.isNullOrEmpty(_firebaseAppToken)))
                               ]),
                         ),
                       ),
@@ -294,14 +201,6 @@ class _HomePageState extends State<HomePage> {
                       })
                 )
             ),
-            // SimpleButton('Open notifications permission page',
-            //     onPressed: () => redirectToPermissionsPage().then(
-            //         (isAllowed) =>
-            //           setState(() {
-            //             notificationsAllowed = isAllowed;
-            //           })
-            //     )
-            // ),
             SimpleButton('Show notification with custom sound',
                 onPressed: () {
                   showCustomSoundNotification(6);
@@ -362,19 +261,19 @@ class _HomePageState extends State<HomePage> {
             SimpleButton('test socket connection, join solo room (bro home)',
                 onPressed: () async {
                   print("pressed the join solo room button");
-                  socket.joinRoom("room_1");
+                  socket.joinRoomSolo();
                 }),
-            SimpleButton('test socket connection, join room 1 (a chat)',
+            SimpleButton('test socket connection, join chat room (a chat)',
                 onPressed: () async {
                   print("pressed the join room 1 button");
-                  socket.joinRoom("1_2");
+                  socket.joinRoomChat();
                 }),
             SimpleButton('test socket connection, leave solo room (bro home)',
                 onPressed: () async {
                   print("pressed the leave solo room button");
                   socket.leaveRoom("room_1");
                 }),
-            SimpleButton('test socket connection, leave room 1 (a chat)',
+            SimpleButton('test socket connection, leave chat room (a chat)',
                 onPressed: () async {
                   print("pressed the leave room 1 button");
                   socket.leaveRoom("1_2");
@@ -384,7 +283,61 @@ class _HomePageState extends State<HomePage> {
                   print("pressed the send message button");
                   socket.sendMessage("test", "1_2");
                 }),
+            SimpleButton('test socket connection, send message with couple seconds delay',
+                onPressed: () async {
+                  print("pressed the send message with delay button");
+                  socket.sendMessageWithDelay("test", "1_2");
+                }),
+            SimpleButton('go to a different page!',
+                onPressed: () async {
+                  print("going to a different page");
+                  Navigator.pushReplacement(
+                      context, MaterialPageRoute(builder: (context) => DifferentPage()));
+                }),
+            SimpleButton('send registration id to server',
+                onPressed: () async {
+                  print("sending registration id to server");
+                  sendRegistration("room_1");
+                }),
+            Text(
+                'Latest socked string: $debugString',
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black
+                )),
           ],
         ));
+  }
+
+  void updateFirebaseToken(String firebaseToken) {
+    print("we have found a token");
+    print(firebaseToken);
+    setState(() {
+      _firebaseAppToken = firebaseToken;
+    });
+  }
+
+  void messageReceivedSolo(var data) {
+    print("received a message SOLO!");
+    print(data);
+    updateDebugString(data);
+  }
+
+  void messageReceivedChat(var data) {
+    print("received a message CHAT!");
+    print(data);
+    updateDebugString(data);
+  }
+
+  void sendRegistration(String room) {
+    print("firebase token?");
+    print(_firebaseAppToken);
+    socket.sendRegistrationId(_firebaseAppToken, room);
+  }
+
+  void updateDebugString(String debugString) {
+    setState(() {
+      this.debugString = debugString;
+    });
   }
 }
