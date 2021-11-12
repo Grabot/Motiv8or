@@ -131,10 +131,6 @@ Future<void> showCustomSoundNotification(int id) async {
           channelKey: "custom_sound",
           title: 'It\'s time to morph!',
           body: 'It\'s time to go save the world!',
-          notificationLayout: NotificationLayout.BigPicture,
-          bigPicture: 'asset://assets/images/fireman-hero.jpg',
           color: Colors.yellow,
-          payload: {
-            'secret': 'the green ranger and the white ranger are the same person'
-          }));
+      ));
 }
