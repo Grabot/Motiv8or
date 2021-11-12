@@ -1,16 +1,6 @@
-import 'dart:math';
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart' hide DateUtils;
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:motiv8tor/common_widgets/led_light.dart';
-import 'package:motiv8tor/common_widgets/simple_button.dart';
 import 'package:motiv8tor/util/notification_service.dart';
-import 'package:motiv8tor/util/notification_util.dart';
 import 'package:motiv8tor/util/socket_services.dart';
-import 'package:numberpicker/numberpicker.dart';
-
-import '../constants.dart';
 
 class DifferentPage extends StatefulWidget {
   @override
@@ -49,9 +39,6 @@ class _DifferentPageState extends State<DifferentPage> {
 
   @override
   void dispose() {
-    AwesomeNotifications().createdSink.close();
-    AwesomeNotifications().displayedSink.close();
-    AwesomeNotifications().actionSink.close();
     super.dispose();
   }
 
@@ -86,14 +73,6 @@ class _DifferentPageState extends State<DifferentPage> {
                               style: TextStyle(color: Colors.black87),
                               text: 'Firebase status:\n',
                               children: [
-                                TextSpan(
-                                    style: TextStyle(
-                                        color: !StringUtils.isNullOrEmpty(_firebaseAppToken)
-                                            ? Colors.green
-                                            : Colors.redAccent),
-                                    text: (!StringUtils.isNullOrEmpty(_firebaseAppToken) ? 'Available' : 'Unavailable') +
-                                        '\n'),
-                                WidgetSpan(child: LedLight(!StringUtils.isNullOrEmpty(_firebaseAppToken)))
                               ]),
                         ),
                       ),

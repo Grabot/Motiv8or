@@ -1,8 +1,7 @@
-import 'dart:math';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:motiv8tor/pages/home_page.dart';
 import 'package:motiv8tor/services/debug.dart';
 import 'package:motiv8tor/util/shared.dart';
@@ -21,69 +20,6 @@ void main() async {
           defaultColor: Color(0xFF9D50DD),
           ledColor: Colors.white),
       NotificationChannel(
-          channelKey: 'badge_channel',
-          channelName: 'Badge indicator notifications',
-          channelDescription: 'Notification channel to activate badge indicator',
-          channelShowBadge: true,
-          defaultColor: Color(0xFF9D50DD),
-          ledColor: Colors.yellow),
-      NotificationChannel(
-          channelKey: 'ringtone_channel',
-          channelName: 'Ringtone Channel',
-          channelDescription: 'Channel with default ringtone',
-          defaultColor: Color(0xFF9D50DD),
-          ledColor: Colors.white,
-          defaultRingtoneType: DefaultRingtoneType.Ringtone),
-      NotificationChannel(
-          channelKey: 'updated_channel',
-          channelName: 'Channel to update',
-          channelDescription: 'Notifications with not updated channel',
-          defaultColor: Color(0xFF9D50DD),
-          ledColor: Colors.white),
-      NotificationChannel(
-          channelKey: 'chats',
-          channelName: 'Chat groups',
-          channelDescription: 'This is a simple example channel of a chat group',
-          channelShowBadge: true,
-          importance: NotificationImportance.Max,
-          ledColor: Colors.white,
-          defaultColor: Color(0xFF9D50DD),
-      ),
-      NotificationChannel(
-          channelKey: 'low_intensity',
-          channelName: 'Low intensity notifications',
-          channelDescription:
-              'Notification channel for notifications with low intensity',
-          defaultColor: Colors.green,
-          ledColor: Colors.green,
-          vibrationPattern: lowVibrationPattern),
-      NotificationChannel(
-          channelKey: 'medium_intensity',
-          channelName: 'Medium intensity notifications',
-          channelDescription:
-              'Notification channel for notifications with medium intensity',
-          defaultColor: Colors.yellow,
-          ledColor: Colors.yellow,
-          vibrationPattern: mediumVibrationPattern),
-      NotificationChannel(
-          channelKey: 'high_intensity',
-          channelName: 'High intensity notifications',
-          channelDescription:
-              'Notification channel for notifications with high intensity',
-          defaultColor: Colors.red,
-          ledColor: Colors.red,
-          vibrationPattern: highVibrationPattern),
-      NotificationChannel(
-          channelKey: "private_channel",
-          channelName: "Privates notification channel",
-          channelDescription: "Privates notification from lock screen",
-          playSound: true,
-          defaultColor: Colors.red,
-          ledColor: Colors.red,
-          vibrationPattern: lowVibrationPattern,
-          defaultPrivacy: NotificationPrivacy.Private),
-      NotificationChannel(
-          icon: 'resource://drawable/res_power_ranger_thunder',
           channelKey: "custom_sound",
           channelName: "Custom sound notifications",
           channelDescription: "Notifications with custom sound",
@@ -92,77 +28,9 @@ void main() async {
           defaultColor: Colors.red,
           ledColor: Colors.red,
           vibrationPattern: lowVibrationPattern),
-      NotificationChannel(
-          channelKey: "silenced",
-          channelName: "Silenced notifications",
-          channelDescription: "The most quiet notifications",
-          playSound: false,
-          enableVibration: false,
-          enableLights: false),
-      NotificationChannel(
-        icon: 'resource://drawable/res_media_icon',
-        channelKey: 'media_player',
-        channelName: 'Media player controller',
-        channelDescription: 'Media player controller',
-        defaultPrivacy: NotificationPrivacy.Public,
-        enableVibration: false,
-        enableLights: false,
-        playSound: false,
-        locked: true),
-      NotificationChannel(
-          channelKey: 'big_picture',
-          channelName: 'Big pictures',
-          channelDescription: 'Notifications with big and beautiful images',
-          defaultColor: Color(0xFF9D50DD),
-          ledColor: Color(0xFF9D50DD),
-          vibrationPattern: lowVibrationPattern),
-      NotificationChannel(
-          channelKey: 'big_text',
-          channelName: 'Big text notifications',
-          channelDescription: 'Notifications with a expandable body text',
-          defaultColor: Colors.blueGrey,
-          ledColor: Colors.blueGrey,
-          vibrationPattern: lowVibrationPattern),
-      NotificationChannel(
-          channelKey: 'inbox',
-          channelName: 'Inbox notifications',
-          channelDescription: 'Notifications with inbox layout',
-          defaultColor: Color(0xFF9D50DD),
-          ledColor: Color(0xFF9D50DD),
-          vibrationPattern: mediumVibrationPattern),
-      NotificationChannel(
-          channelKey: 'scheduled',
-          channelName: 'Scheduled notifications',
-          channelDescription: 'Notifications with schedule functionality',
-          defaultColor: Color(0xFF9D50DD),
-          ledColor: Color(0xFF9D50DD),
-          vibrationPattern: lowVibrationPattern,
-          importance: NotificationImportance.High,
-          defaultRingtoneType: DefaultRingtoneType.Alarm),
-      NotificationChannel(
-          icon: 'resource://drawable/res_download_icon',
-          channelKey: 'progress_bar',
-          channelName: 'Progress bar notifications',
-          channelDescription: 'Notifications with a progress bar layout',
-          defaultColor: Colors.deepPurple,
-          ledColor: Colors.deepPurple,
-          vibrationPattern: lowVibrationPattern,
-          onlyAlertOnce: true),
-      NotificationChannel(
-          channelKey: 'grouped',
-          channelName: 'Grouped notifications',
-          channelDescription: 'Notifications with group functionality',
-          groupKey: 'grouped',
-          groupSort: GroupSort.Desc,
-          groupAlertBehavior: GroupAlertBehavior.Children,
-          defaultColor: Colors.lightGreen,
-          ledColor: Colors.lightGreen,
-          vibrationPattern: lowVibrationPattern,
-          importance: NotificationImportance.High)
     ],
     debug: true
   );
-
   // Uncomment those lines after activate google services inside example/android/build.gradle
   // Create the initialization Future outside of `build`:
   FirebaseApp firebaseApp = await Firebase.initializeApp();
@@ -178,10 +46,16 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   var socket = SocketServices();
   print('Handling a background message: ${message.messageId}');
-  print('Message data: ${message.data}');
+  String? title = message.notification!.title;
+  String? body = message.notification!.body;
   print("message: $message");
+  print("notification1? : ${message.notification}");
+  print("notification2? : $title");
+  print("notification3? : $body");
+  print('Message data: ${message.data}');
+
+  String sendString = "background message:         title: ${message.notification!.title}        body:${message.notification!.body}       data in the notification:${message.data}";
   Debug debug = new Debug();
-  String sendString = "background: " + message.data.toString();
   if (socket.isConnected()) {
     sendString = "SOCKET!   " + sendString;
   }

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart' hide DateUtils;
 import 'package:motiv8tor/common_widgets/led_light.dart';
 import 'package:motiv8tor/common_widgets/simple_button.dart';
 import 'package:motiv8tor/pages/different_page.dart';
+import 'package:motiv8tor/services/debug.dart';
 import 'package:motiv8tor/util/notification_service.dart';
-import 'package:motiv8tor/util/notification_util.dart';
 import 'package:motiv8tor/util/shared.dart';
 import 'package:motiv8tor/util/socket_services.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -123,9 +123,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    AwesomeNotifications().createdSink.close();
-    AwesomeNotifications().displayedSink.close();
-    AwesomeNotifications().actionSink.close();
     super.dispose();
   }
 
@@ -162,12 +159,12 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 TextSpan(
                                     style: TextStyle(
-                                        color: !StringUtils.isNullOrEmpty(_firebaseAppToken)
+                                        color: _firebaseAppToken != ""
                                             ? Colors.green
                                             : Colors.redAccent),
-                                    text: (!StringUtils.isNullOrEmpty(_firebaseAppToken) ? 'Available' : 'Unavailable') +
+                                    text: (_firebaseAppToken != "" ? 'Available' : 'Unavailable') +
                                         '\n'),
-                                WidgetSpan(child: LedLight(!StringUtils.isNullOrEmpty(_firebaseAppToken)))
+                                WidgetSpan(child: LedLight(_firebaseAppToken != ""))
                               ]),
                         ),
                       ),
@@ -206,16 +203,12 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   showCustomSoundNotification(6);
                 }),
-            SimpleButton('Cancel notification',
-                backgroundColor: Colors.red,
-                labelColor: Colors.white,
-                onPressed: () => cancelNotification(6)),
             SimpleButton('Schedule notification with local time zone',
                 onPressed: () async {
               DateTime? pickedDate =
                   await pickScheduleDate(context, isUtc: false);
               if (pickedDate != null) {
-                showNotificationAtScheduleCron(pickedDate);
+                // showNotificationAtScheduleCron(pickedDate);
               }
             }),
             SimpleButton('Schedule notification with utc time zone',
@@ -223,7 +216,7 @@ class _HomePageState extends State<HomePage> {
               DateTime? pickedDate =
                   await pickScheduleDate(context, isUtc: true);
               if (pickedDate != null) {
-                showNotificationAtScheduleCron(pickedDate);
+                // showNotificationAtScheduleCron(pickedDate);
               }
             }),
             SizedBox(
@@ -289,6 +282,16 @@ class _HomePageState extends State<HomePage> {
                   print("pressed the send message with delay button");
                   socket.sendMessageWithDelay("test", "1_2");
                 }),
+            SimpleButton('test socket connection, send custom message in chat',
+                onPressed: () async {
+                  print("pressed the send custom message button");
+                  socket.sendMessageCustom("test", "1_2");
+                }),
+            SimpleButton('test socket connection, send custom message with couple seconds delay',
+                onPressed: () async {
+                  print("pressed the send custom message with delay button");
+                  socket.sendMessageWithDelayCustom("test", "1_2");
+                }),
             SimpleButton('go to a different page!',
                 onPressed: () async {
                   print("going to a different page");
@@ -341,6 +344,14 @@ class _HomePageState extends State<HomePage> {
   void sendRegistration(String room) {
     print("firebase token?");
     print(_firebaseAppToken);
+    Debug debug = new Debug();
+    debug.debugPost(_firebaseAppToken).then((val) {
+      if (val) {
+        print("we have successfully send an update");
+      } else {
+        print("sending a debug post FAILED!");
+      }
+    });
     socket.sendRegistrationId(_firebaseAppToken, room);
   }
 

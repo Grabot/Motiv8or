@@ -123,6 +123,36 @@ class SocketServices {
     }
   }
 
+  sendMessageCustom(String message, String room) {
+    if (socket!.connected) {
+      // The room could be for a chat
+      // roomSolo is the room for this phone specifically
+      socket!.emit(
+        "message_custom",
+        {
+          "id": 1.toString(),
+          "message": message,
+          "room": room,
+        },
+      );
+    }
+  }
+
+  sendMessageWithDelayCustom(String message, String room) {
+    if (socket!.connected) {
+      // The room could be for a chat
+      // roomSolo is the room for this phone specifically
+      socket!.emit(
+        "message_with_delay_custom",
+        {
+          "id": 1.toString(),
+          "message": message,
+          "room": room,
+        },
+      );
+    }
+  }
+
   sendRegistrationId(String registrationId, String room) {
     if (socket!.connected) {
       // The room could be for a chat
