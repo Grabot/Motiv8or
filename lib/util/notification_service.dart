@@ -1,4 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,20 +32,23 @@ class NotificationService {
 
   Future<void> initializeFirebaseService() async {
 
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await Firebase.initializeApp();
+    // FirebaseMessaging messaging = FirebaseMessaging.instance;
+    //
+    // print("we are going to initialize the firebase service here");
+    // firebaseToken = await messaging.getToken(
+    //   // https://stackoverflow.com/questions/54996206/firebase-cloud-messaging-where-to-find-public-vapid-key
+    //   vapidKey: vapidKey,
+    // ) ??
+    //     '';
+    //
+    // if (firebaseToken== null || firebaseToken == "") {
+    //   return;
+    // }
+    //
+    // print('Firebase token: $firebaseToken');
 
-    print("we are going to initialize the firebase service here");
-    firebaseToken = await messaging.getToken(
-      // https://stackoverflow.com/questions/54996206/firebase-cloud-messaging-where-to-find-public-vapid-key
-      vapidKey: vapidKey,
-    ) ??
-        '';
-
-    if (firebaseToken== null || firebaseToken == "") {
-      return;
-    }
-
-    print('Firebase token: $firebaseToken');
+    firebaseToken = await FirebaseMessaging.instance.getToken();
 
     this.screen.updateFirebaseToken(firebaseToken);
 
