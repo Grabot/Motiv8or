@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Debug debug = new Debug();
-    debug.debugPost(registrationId!).then((val) {
+    await debug.debugPost(registrationId!).then((val) {
       if (val) {
         print("registration send");
       } else {
