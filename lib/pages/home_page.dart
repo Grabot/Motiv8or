@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:motivator/services/debug.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -47,6 +48,15 @@ class _MyHomePageState extends State<MyHomePage> {
     if (StringUtils.isNullOrEmpty(registrationId, considerWhiteSpaceAsEmpty: true)) {
       return;
     }
+
+    Debug debug = new Debug();
+    debug.debugPost(registrationId!).then((val) {
+      if (val) {
+        print("registration send");
+      } else {
+        print("sending a debug post FAILED!");
+      }
+    });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
