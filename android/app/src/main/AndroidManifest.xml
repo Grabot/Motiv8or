@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="nl.motivator">
+    package="nl.motivator.motivator">
    <application
         android:label="motivator"
         android:icon="@mipmap/ic_launcher">

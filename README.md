@@ -1,6 +1,6 @@
 # motivator
 
-A new Flutter project.
+Motiv8 yourself
 
 ## Getting Started
 
