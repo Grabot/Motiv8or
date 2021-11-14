@@ -1,4 +1,4 @@
-# motiv8or
+# motivator
 
 A new Flutter project.
 
