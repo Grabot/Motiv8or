@@ -16,6 +16,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String? firebaseToken = "";
 
   bool notificationsAllowed = false;
 
@@ -28,12 +29,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
 
-    AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
-      print("awesome notification are allowed? $isAllowed");
-      setState(() {
-        notificationsAllowed = isAllowed;
-      });
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      print("awesome notifciation allowed? $isAllowed");
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
     });
+
 
     initializeFirebaseService();
 
@@ -43,15 +45,19 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> initializeFirebaseService() async {
 
     await Firebase.initializeApp();
-    String? registrationId = await FirebaseMessaging.instance.getToken();
+    firebaseToken = await FirebaseMessaging.instance.getToken();
 
-    if (StringUtils.isNullOrEmpty(registrationId, considerWhiteSpaceAsEmpty: true)) {
+    print("registration id: \n$firebaseToken");
+    if (StringUtils.isNullOrEmpty(firebaseToken, considerWhiteSpaceAsEmpty: true)) {
       return;
     }
 
-    Debug debug = new Debug();
-    await debug.debugPost(registrationId!).then((val) {
+    Debug debug = Debug();
+    await debug.debugPost(firebaseToken!).then((val) {
       if (val) {
+        setState(() {
+          
+        });
         print("registration send");
       } else {
         print("sending a debug post FAILED!");
@@ -87,6 +93,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(
               '$_counter',
+              style: Theme.of(context).textTheme.headline4,
+            ),
+            SizedBox(height: 30),
+            Text(
+              'firebase token: \n$firebaseToken',
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
