@@ -29,6 +29,24 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
 
+    AwesomeNotifications().createdStream.listen((receivedNotification) {
+      String? createdSourceText =
+      AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
+      print('$createdSourceText notification created');
+    });
+
+    AwesomeNotifications().displayedStream.listen((receivedNotification) {
+      String? createdSourceText =
+      AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
+      print('$createdSourceText notification displayed');
+    });
+
+    AwesomeNotifications().dismissedStream.listen((receivedAction) {
+      String? dismissedSourceText = AssertUtils.toSimpleEnumString(
+          receivedAction.dismissedLifeCycle);
+      print('Notification dismissed on $dismissedSourceText');
+    });
+
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
       print("awesome notifciation allowed? $isAllowed");
       if (!isAllowed) {
@@ -87,17 +105,22 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            TextButton(
+                onPressed: () {
+                  showCustomSoundNotification(6);
+                },
+                child: Text("click here for sound notification!")
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            SizedBox(height: 30),
+            TextButton(
+                onPressed: () {
+                  print("pressed the second button!");
+                },
+                child: Text("click here for another debug thingy!")
             ),
             SizedBox(height: 30),
             Text(
               'firebase token: \n$firebaseToken',
-              style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
@@ -109,4 +132,18 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  Future<void> showCustomSoundNotification(int id) async {
+    await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+            id: id,
+            channelKey: "custom_sound",
+            title: 'It\'s time to morph!',
+            body: 'It\'s time to go save the world!',
+            color: Colors.yellow,
+            payload: {
+              'secret': 'the green ranger and the white ranger are the same person'
+            }));
+  }
+
 }
