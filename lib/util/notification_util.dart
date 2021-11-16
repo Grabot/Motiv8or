@@ -11,6 +11,7 @@ class NotificationUtil {
   String? firebaseToken;
   var screen;
 
+  Debug? debug = null;
 
   factory NotificationUtil() {
     return _instance;
@@ -22,6 +23,7 @@ class NotificationUtil {
     this.screen = screen;
     if (firebaseToken == null) {
 
+      debug = Debug();
       AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
         print("awesome notifciation allowed? $isAllowed");
         if (!isAllowed) {
@@ -54,9 +56,10 @@ class NotificationUtil {
         // If the user clicks this notification, this function is called
         print("clicked notification when app opened");
         print(receivedNotification);
-        print(receivedNotification.title);
-        print(receivedNotification.body);
-        print(receivedNotification.payload);
+        print("title: ${receivedNotification.title}");
+        print("body: ${receivedNotification.body}");
+        print("data: ${receivedNotification.payload}");
+        sendDebugString("foreground:   ", receivedNotification.title, receivedNotification.body, receivedNotification.payload.toString());
       });
 
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
@@ -67,7 +70,8 @@ class NotificationUtil {
         print("notification: ${message.notification}");
         print("title: ${message.notification!.title}");
         print("body: ${message.notification!.body}");
-        print("body: ${message.data}");
+        print("data: ${message.data}");
+        sendDebugString("background:   ", message.notification!.title, message.notification!.body, message.data.toString());
       });
 
       await initializeFirebaseService();
@@ -84,40 +88,44 @@ class NotificationUtil {
       return;
     }
 
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("foreground on message: $message");
+      String? title = message.notification!.title;
+      String? body = message.notification!.body;
+      String data = message.data.toString();
+      showCustomSoundNotification(title!, body!, data);
+    });
+  }
+
+  sendFirebaseToken() {
     Debug debug = Debug();
-    await debug.debugPost(firebaseToken!).then((val) {
+    debug.debugPost(firebaseToken!).then((val) {
       if (val) {
         print("registration send");
       } else {
         print("sending a debug post FAILED!");
       }
     });
+  }
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("foreground on message: $message");
-      String? title = message.notification!.title;
-      String? body = message.notification!.body;
-      String data = message.data.toString();
-      Debug debug = Debug();
-      String sendString = "foreground: ";
-      sendString = sendString + "   title $title";
-      sendString = sendString + "   body $body";
-      sendString = sendString + "   data $data";
-      HelperFunction.getTestString().then((val) {
-        if (val == null || val == "") {
-          sendString = "no test string:  " + sendString;
+  sendDebugString(String notificationDetail, String? title, String? body, String data) {
+    String sendString = notificationDetail;
+    sendString = sendString + "   title $title";
+    sendString = sendString + "   body $body";
+    sendString = sendString + "   data $data";
+    HelperFunction.getTestString().then((val) {
+      if (val == null || val == "") {
+        sendString = "no test string:  " + sendString;
+      } else {
+        sendString = val + ":   " + sendString;
+      }
+      debug!.debugPost(sendString).then((val) {
+        if (val) {
+          print("we have successfully send an update");
         } else {
-          sendString = val + ":   " + sendString;
+          print("sending a debug post FAILED!");
         }
-        debug.debugPost(sendString).then((val) {
-          if (val) {
-            print("we have successfully send an update");
-          } else {
-            print("sending a debug post FAILED!");
-          }
-        });
       });
-      showCustomSoundNotification();
     });
   }
 
@@ -166,15 +174,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 
-Future<void> showCustomSoundNotification() async {
+Future<void> showCustomSoundNotification(String title, String body, var data) async {
   await AwesomeNotifications().createNotification(
       content: NotificationContent(
           id: 6,
           channelKey: "custom_sound",
-          title: 'It\'s time to morph!',
-          body: 'It\'s time to go save the world!',
+          title: title,
+          body: body,
           color: Color(int.parse("0xFF039BE5")),
           payload: {
-            'secret': 'the green ranger and the white ranger are the same person'
+            'data': data
           }));
 }

@@ -42,16 +42,16 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             TextButton(
                 onPressed: () {
-                  showCustomSoundNotification();
+                  showCustomSoundNotification("custom title", "custom body", "");
                 },
                 child: const Text("click here for sound notification!")
             ),
             SizedBox(height: 30),
             TextButton(
                 onPressed: () {
-                  print("pressed the second button!");
+                  notificationUtil.sendFirebaseToken();
                 },
-                child: const Text("click here for another debug thingy!")
+                child: const Text("send the firebase token!")
             ),
             Row(
               children: [
