@@ -141,6 +141,11 @@ class NotificationUtil {
     AwesomeNotifications().actionSink.close();
   }
 
+  Future<bool> redirectToPermissionsPage() async {
+    await AwesomeNotifications().showNotificationConfigPage();
+    return await AwesomeNotifications().isNotificationAllowed();
+  }
+
   void firebaseBackgroundInitialization() async {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

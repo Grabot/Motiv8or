@@ -53,6 +53,13 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: const Text("send the firebase token!")
             ),
+            SizedBox(height:10),
+            TextButton(
+              onPressed: () {
+                notificationUtil.redirectToPermissionsPage();
+              },
+              child: Text("open the notification permission page")
+            ),
             Row(
               children: [
                 Container(
