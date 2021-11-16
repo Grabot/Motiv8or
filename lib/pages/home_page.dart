@@ -1,91 +1,31 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/services.dart';
-import 'package:motivator/services/debug.dart';
+import 'package:motivator/pages/page_1.dart';
+import 'package:motivator/pages/page_2.dart';
+import 'package:motivator/pages/page_3.dart';
+import 'package:motivator/pages/page_4.dart';
+import 'package:motivator/util/notification_util.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
   String? firebaseToken = "";
-
-  bool notificationsAllowed = false;
 
   @override
   void initState() {
-
-    AwesomeNotifications().createdStream.listen((receivedNotification) {
-      String? createdSourceText =
-      AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
-      print('$createdSourceText notification created');
-    });
-
-    AwesomeNotifications().displayedStream.listen((receivedNotification) {
-      String? createdSourceText =
-      AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
-      print('$createdSourceText notification displayed');
-    });
-
-    AwesomeNotifications().dismissedStream.listen((receivedAction) {
-      String? dismissedSourceText = AssertUtils.toSimpleEnumString(
-          receivedAction.dismissedLifeCycle);
-      print('Notification dismissed on $dismissedSourceText');
-    });
-
-    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      print("awesome notifciation allowed? $isAllowed");
-      if (!isAllowed) {
-        AwesomeNotifications().requestPermissionToSendNotifications();
-      }
-    });
-
-    initializeFirebaseService();
-
+    NotificationUtil notificationUtil = NotificationUtil();
+    notificationUtil.initialize();
+    firebaseToken = notificationUtil.getFirebaseToken();
     super.initState();
-  }
-
-  Future<void> initializeFirebaseService() async {
-
-    await Firebase.initializeApp();
-    firebaseToken = await FirebaseMessaging.instance.getToken();
-
-    print("registration id: \n$firebaseToken");
-    if (StringUtils.isNullOrEmpty(firebaseToken, considerWhiteSpaceAsEmpty: true)) {
-      return;
-    }
-
-    Debug debug = Debug();
-    await debug.debugPost(firebaseToken!).then((val) {
-      if (val) {
-        setState(() {
-          
-        });
-        print("registration send");
-      } else {
-        print("sending a debug post FAILED!");
-      }
-    });
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
-    });
   }
 
   @override
   void dispose() {
-    AwesomeNotifications().createdSink.close();
-    AwesomeNotifications().displayedSink.close();
-    AwesomeNotifications().actionSink.close();
     super.dispose();
   }
 
@@ -93,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text("Test app for notifications and socket connection"),
       ),
       body: Center(
         child: Column(
@@ -101,16 +41,60 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             TextButton(
                 onPressed: () {
-                  showCustomSoundNotification(6);
+                  showCustomSoundNotification();
                 },
-                child: Text("click here for sound notification!")
+                child: const Text("click here for sound notification!")
             ),
             SizedBox(height: 30),
             TextButton(
                 onPressed: () {
                   print("pressed the second button!");
                 },
-                child: Text("click here for another debug thingy!")
+                child: const Text("click here for another debug thingy!")
+            ),
+            Row(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width/4,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => const PageOne()));
+                      },
+                      child: const Text("Page 1")
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width/4,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => const PageTwo()));
+                      },
+                      child: const Text("Page 2")
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width/4,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => const PageThree()));
+                      },
+                      child: const Text("Page 3")
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width/4,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => const PageFour()));
+                      },
+                      child: const Text("Page 4")
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 30),
             Text(
@@ -121,18 +105,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  Future<void> showCustomSoundNotification(int id) async {
-    await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-            id: id,
-            channelKey: "custom_sound",
-            title: 'It\'s time to morph!',
-            body: 'It\'s time to go save the world!',
-            color: Colors.yellow,
-            payload: {
-              'secret': 'the green ranger and the white ranger are the same person'
-            }));
-  }
-
 }
