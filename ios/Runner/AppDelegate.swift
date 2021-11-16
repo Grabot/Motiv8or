@@ -17,26 +17,4 @@ import firebase_auth
     override init() {
         FirebaseApp.configure()
     }
-    
-    override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-          Messaging.messaging().apnsToken = deviceToken
-          super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
-      }
-
-        override func application(_ application: UIApplication,
-            didReceiveRemoteNotification notification: [AnyHashable : Any],
-            fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-            if Auth.auth().canHandleNotification(notification) {
-              completionHandler(.noData)
-              return
-            }
-        }
-
-        override func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
-            if Auth.auth().canHandle(url) {
-              return true
-            }
-            return false;
-          }
-    
 }
