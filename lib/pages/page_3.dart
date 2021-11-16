@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:motivator/util/notification_util.dart';
 
 import 'home_page.dart';
 
@@ -11,6 +12,15 @@ class PageThree extends StatefulWidget {
 }
 
 class _PageThreeState extends State<PageThree> {
+
+  @override
+  void initState() {
+    NotificationUtil notificationUtil = NotificationUtil();
+    notificationUtil.initialize(this);
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,4 +42,9 @@ class _PageThreeState extends State<PageThree> {
       )
       );
     }
+
+  update() {
+    setState(() {
+    });
+  }
 }

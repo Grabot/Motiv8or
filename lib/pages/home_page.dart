@@ -16,11 +16,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String? firebaseToken = "";
 
+  late NotificationUtil notificationUtil;
+
   @override
   void initState() {
-    NotificationUtil notificationUtil = NotificationUtil();
-    notificationUtil.initialize();
-    firebaseToken = notificationUtil.getFirebaseToken();
+    notificationUtil = NotificationUtil();
+    notificationUtil.initialize(this);
     super.initState();
   }
 
@@ -104,5 +105,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  update() {
+    setState(() {
+      firebaseToken = notificationUtil.getFirebaseToken();
+    });
   }
 }

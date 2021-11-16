@@ -9,14 +9,17 @@ class NotificationUtil {
   static final NotificationUtil _instance = NotificationUtil._internal();
 
   String? firebaseToken;
+  var screen;
+
+
   factory NotificationUtil() {
     return _instance;
   }
 
   NotificationUtil._internal();
 
-  initialize() {
-
+  initialize(var screen) async {
+    this.screen = screen;
     if (firebaseToken == null) {
 
       AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
@@ -44,7 +47,31 @@ class NotificationUtil {
         print('Notification dismissed on $dismissedSourceText');
       });
 
-      initializeFirebaseService();
+      AwesomeNotifications().actionStream.listen((ReceivedNotification receivedNotification) {
+        // notification when the user has the app opened
+        // It receives it via firebase messaging and creates a notification
+        // Because firebase will not create one when the app is opened.
+        // If the user clicks this notification, this function is called
+        print("clicked notification when app opened");
+        print(receivedNotification);
+        print(receivedNotification.title);
+        print(receivedNotification.body);
+        print(receivedNotification.payload);
+      });
+
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+        // When the app is closed and the user receives a notification
+        // and the user clicks on the notification. This function is called.
+        print("clicked notification when app closed");
+        print("onMessageOpenedApp: $message");
+        print("notification: ${message.notification}");
+        print("title: ${message.notification!.title}");
+        print("body: ${message.notification!.body}");
+        print("body: ${message.data}");
+      });
+
+      await initializeFirebaseService();
+      this.screen.update();
     }
   }
 
@@ -67,7 +94,7 @@ class NotificationUtil {
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("foreground message: $message");
+      print("foreground on message: $message");
       String? title = message.notification!.title;
       String? body = message.notification!.body;
       String data = message.data.toString();
@@ -90,6 +117,7 @@ class NotificationUtil {
           }
         });
       });
+      showCustomSoundNotification();
     });
   }
 

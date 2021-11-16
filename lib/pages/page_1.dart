@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:motivator/pages/home_page.dart';
+import 'package:motivator/util/notification_util.dart';
 
 class PageOne extends StatefulWidget {
   const PageOne({Key? key}) : super(key: key);
@@ -10,6 +11,15 @@ class PageOne extends StatefulWidget {
 }
 
 class _PageOneState extends State<PageOne> {
+
+  @override
+  void initState() {
+    NotificationUtil notificationUtil = NotificationUtil();
+    notificationUtil.initialize(this);
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,4 +41,9 @@ class _PageOneState extends State<PageOne> {
       )
       );
     }
+
+  update() {
+    setState(() {
+    });
+  }
 }
