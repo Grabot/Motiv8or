@@ -1,8 +1,6 @@
 import UIKit
 import Flutter
 import Firebase
-import firebase_messaging
-import firebase_auth
 
 
 @UIApplicationMain

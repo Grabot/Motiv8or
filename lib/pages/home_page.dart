@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             TextButton(
                 onPressed: () {
-                  showCustomSoundNotification("custom title", "custom body", "");
+                  // showCustomSoundNotification("custom title", "custom body", "");
                 },
                 child: const Text("click here for sound notification!")
             ),
@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height:10),
             TextButton(
               onPressed: () {
-                notificationUtil.redirectToPermissionsPage();
+                // notificationUtil.redirectToPermissionsPage();
               },
               child: Text("open the notification permission page")
             ),
