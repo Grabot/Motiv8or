@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:motivator/services/debug.dart';
 import 'package:motivator/util/shared.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'dart:developer';
+
 
 class NotificationUtil {
   static final NotificationUtil _instance = NotificationUtil._internal();
@@ -25,7 +27,7 @@ class NotificationUtil {
 
       debug = Debug();
       AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-        print("awesome notifciation allowed? $isAllowed");
+        log("awesome notifciation allowed? $isAllowed");
         if (!isAllowed) {
           AwesomeNotifications().requestPermissionToSendNotifications();
         }
@@ -34,19 +36,19 @@ class NotificationUtil {
       AwesomeNotifications().createdStream.listen((receivedNotification) {
         String? createdSourceText =
         AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
-        print('$createdSourceText notification created');
+        log('$createdSourceText notification created');
       });
 
       AwesomeNotifications().displayedStream.listen((receivedNotification) {
         String? createdSourceText =
         AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
-        print('$createdSourceText notification displayed');
+        log('$createdSourceText notification displayed');
       });
 
       AwesomeNotifications().dismissedStream.listen((receivedAction) {
         String? dismissedSourceText = AssertUtils.toSimpleEnumString(
             receivedAction.dismissedLifeCycle);
-        print('Notification dismissed on $dismissedSourceText');
+        log('Notification dismissed on $dismissedSourceText');
       });
 
       AwesomeNotifications().actionStream.listen((ReceivedNotification receivedNotification) {
@@ -54,24 +56,27 @@ class NotificationUtil {
         // It receives it via firebase messaging and creates a notification
         // Because firebase will not create one when the app is opened.
         // If the user clicks this notification, this function is called
-        print("clicked notification when app opened");
-        print(receivedNotification);
-        print("title: ${receivedNotification.title}");
-        print("body: ${receivedNotification.body}");
-        print("data: ${receivedNotification.payload}");
+        log("clicked notification when app opened");
+        log("title: ${receivedNotification.title}");
+        log("body: ${receivedNotification.body}");
+        log("data: ${receivedNotification.payload}");
         sendDebugString("foreground:   ", receivedNotification.title, receivedNotification.body, receivedNotification.payload.toString());
       });
 
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
         // When the app is closed and the user receives a notification
         // and the user clicks on the notification. This function is called.
-        print("clicked notification when app closed");
-        print("onMessageOpenedApp: $message");
-        print("notification: ${message.notification}");
-        print("title: ${message.notification!.title}");
-        print("body: ${message.notification!.body}");
-        print("data: ${message.data}");
+        log("clicked notification when app closed");
+        log("notification: ${message.notification}");
+        log("title: ${message.notification!.title}");
+        log("body: ${message.notification!.body}");
+        log("data: ${message.data}");
         sendDebugString("background:   ", message.notification!.title, message.notification!.body, message.data.toString());
+      });
+
+      FirebaseMessaging.instance.getInitialMessage().then((message) {
+        log("we have clicked on the message I think");
+        log("message: $message");
       });
 
       await initializeFirebaseService();
@@ -83,13 +88,13 @@ class NotificationUtil {
     await Firebase.initializeApp();
     firebaseToken = await FirebaseMessaging.instance.getToken();
 
-    print("registration id: \n$firebaseToken");
+    log("registration id: \n$firebaseToken");
     if (firebaseToken == null || firebaseToken == "") {
       return;
     }
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("foreground on message: $message");
+      log("foreground on message: $message");
       String? title = message.notification!.title;
       String? body = message.notification!.body;
       String data = message.data.toString();
@@ -101,9 +106,9 @@ class NotificationUtil {
     Debug debug = Debug();
     debug.debugPost(firebaseToken!).then((val) {
       if (val) {
-        print("registration send");
+        log("registration send");
       } else {
-        print("sending a debug post FAILED!");
+        log("sending a debug post FAILED!");
       }
     });
   }
@@ -121,9 +126,9 @@ class NotificationUtil {
       }
       debug!.debugPost(sendString).then((val) {
         if (val) {
-          print("we have successfully send an update");
+          log("we have successfully send an update");
         } else {
-          print("sending a debug post FAILED!");
+          log("sending a debug post FAILED!");
         }
       });
     });
@@ -135,7 +140,7 @@ class NotificationUtil {
 
   @override
   void dispose() {
-    print("disposing the notification util");
+    log("disposing the notification util");
     AwesomeNotifications().createdSink.close();
     AwesomeNotifications().displayedSink.close();
     AwesomeNotifications().actionSink.close();
@@ -149,6 +154,13 @@ class NotificationUtil {
   void firebaseBackgroundInitialization() async {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
   }
 }
 
@@ -161,7 +173,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   sendString = sendString + "   title $title";
   sendString = sendString + "   body $body";
   sendString = sendString + "   data $data";
-  print("background message: $message");
+  log("background message: $message");
   HelperFunction.getTestString().then((val) {
     if (val == null || val == "") {
       sendString = "no test string:  " + sendString;
@@ -170,9 +182,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     }
     debug.debugPost(sendString).then((val) {
       if (val) {
-        print("we have successfully send an update");
+        log("we have successfully send an update");
       } else {
-        print("sending a debug post FAILED!");
+        log("sending a debug post FAILED!");
       }
     });
   });

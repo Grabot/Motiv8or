@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     notificationUtil = NotificationUtil();
     notificationUtil.initialize(this);
+
     super.initState();
   }
 
