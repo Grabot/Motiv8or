@@ -1,13 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:motivator/services/debug.dart';
 import 'package:motivator/util/shared.dart';
 import 'package:logging/logging.dart';
+import 'package:notification_permissions/notification_permissions.dart';
 
 
 class NotificationUtil {
-
-  final log = Logger('ExampleLogger');
 
   static final NotificationUtil _instance = NotificationUtil._internal();
 
@@ -15,6 +15,14 @@ class NotificationUtil {
   var screen;
 
   Debug? debug = null;
+
+  Map<String, String> channelMap = {
+    "id": "custom_sound",
+    "name": "Brocast notification",
+    "description": "Custom Bro Sound for notifications"
+  };
+
+  static const MethodChannel _channel = MethodChannel('nl.motivator.motivator/channel_bro');
 
   factory NotificationUtil() {
     return _instance;
@@ -30,11 +38,22 @@ class NotificationUtil {
       print('${record.level.name}: ${record.time}: ${record.message}');
     });
 
-    log.shout("Heey, look over here!");
     if (firebaseToken == null) {
       await Firebase.initializeApp();
       debug = Debug();
       await initializeFirebaseService();
+
+      createNotificationChannel();
+
+      // show the dialog/open settings screen
+      NotificationPermissions.requestNotificationPermissions(
+          iosSettings: const NotificationSettingsIos(
+              sound: true, badge: true, alert: true))
+          .then((_) {
+        // when finished, check the permission status
+        print("notifications allowed");
+      });
+
       this.screen.update();
     }
   }
@@ -66,6 +85,15 @@ class NotificationUtil {
       print("message: $message");
     });
 
+  }
+
+  createNotificationChannel() async {
+    try {
+      await _channel.invokeMethod('createNotificationChannel', channelMap);
+      print("channel created");
+    } on PlatformException catch (e) {
+      print(e);
+    }
   }
 
   sendFirebaseToken() {
@@ -107,7 +135,7 @@ class NotificationUtil {
   void firebaseBackgroundInitialization() async {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    await Firebase.initializeApp();
+
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
       alert: true,
@@ -118,7 +146,7 @@ class NotificationUtil {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // not on ios
+
   String? title = message.notification!.title;
   String? body = message.notification!.body;
   String data = message.data.toString();

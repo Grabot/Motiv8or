@@ -5,22 +5,6 @@ import 'package:motivator/util/notification_util.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // AwesomeNotifications().initialize(
-  //   'resource://drawable/res_bro_icon',
-  //   [
-  //     NotificationChannel(
-  //         channelKey: "custom_sound",
-  //         channelName: "Custom sound notifications",
-  //         channelDescription: "Notifications with custom sound",
-  //         playSound: true,
-  //         soundSource: 'resource://raw/res_brodio',
-  //         defaultColor: Colors.red,
-  //         ledColor: Colors.red,
-  //         vibrationPattern: lowVibrationPattern),
-  //   ],
-  //   debug: true
-  // );
-
   NotificationUtil notificationUtil = NotificationUtil();
   notificationUtil.firebaseBackgroundInitialization();
 

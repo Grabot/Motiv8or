@@ -18,7 +18,7 @@ import android.content.ContentResolver;
 
 
 class MainActivity: FlutterActivity() {
-    private val CHANNEL = "nl.motivator.motivator/channel_test" //The channel name you set in your main.dart file
+    private val CHANNEL = "nl.motivator.motivator/channel_bro"
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -45,7 +45,7 @@ class MainActivity: FlutterActivity() {
     private fun createNotificationChannel(mapData: HashMap<String,String>): Boolean {
         val completed: Boolean
         if (VERSION.SDK_INT >= VERSION_CODES.O) {
-            // Create the NotificationChannel
+
             val id = mapData["id"]
             val name = mapData["name"]
             val descriptionText = mapData["description"]
@@ -61,8 +61,7 @@ class MainActivity: FlutterActivity() {
                     .build();
 
             mChannel.setSound(soundUri, att)
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
+
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(mChannel)
             completed = true
