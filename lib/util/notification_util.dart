@@ -5,6 +5,7 @@ import 'package:motivator/services/debug.dart';
 import 'package:motivator/util/shared.dart';
 import 'package:logging/logging.dart';
 import 'package:notification_permissions/notification_permissions.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
 class NotificationUtil {
@@ -23,6 +24,49 @@ class NotificationUtil {
   };
 
   static const MethodChannel _channel = MethodChannel('nl.motivator.motivator/channel_bro');
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  late NotificationDetails platformChannelSpecifics;
+
+  Future<void> init() async {
+    final AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('res_bro_icon');
+
+    //Initialization Settings for iOS devices
+    final IOSInitializationSettings initializationSettingsIOS =
+    IOSInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+    );
+
+    //InitializationSettings for initializing settings for both platforms (Android & iOS)
+    final InitializationSettings initializationSettings =
+    InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS);
+
+    await flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onSelectNotification: selectNotification
+    );
+  }
+
+  void selectNotification(String? payload) {
+    print("selected the notificatoins");
+  }
+
+  void requestIOSPermissions() {
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
 
   factory NotificationUtil() {
     return _instance;
@@ -54,6 +98,23 @@ class NotificationUtil {
         print("notifications allowed");
       });
 
+      platformChannelSpecifics = NotificationDetails(
+          android: AndroidNotificationDetails(
+            'custom_sound',
+            'Brocast notification',
+            playSound: true,
+            priority: Priority.high,
+            importance: Importance.high,
+          ),
+          iOS: IOSNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+              badgeNumber: 0,
+              subtitle: "subtitle",
+              threadIdentifier: "threadIdentifier"
+          ));
+
       this.screen.update();
     }
   }
@@ -71,6 +132,7 @@ class NotificationUtil {
       // open message when the app is in the foreground.
       print('A new onMessage event was published!');
       print("message: $message");
+      _showNotification();
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -136,11 +198,21 @@ class NotificationUtil {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
+    // await FirebaseMessaging.instance
+    //     .setForegroundNotificationPresentationOptions(
+    //   alert: true,
+    //   badge: true,
+    //   sound: true,
+    // );
+  }
+
+  Future<void> _showNotification() async {
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Notification Title',
+      'This is the Notification Body',
+      platformChannelSpecifics,
+      payload: 'Notification Payload',
     );
   }
 }

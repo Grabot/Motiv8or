@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:motivator/pages/page_1.dart';
 import 'package:motivator/pages/page_2.dart';
 import 'package:motivator/pages/page_3.dart';
