@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:motivator/services/debug.dart';
 import 'package:motivator/util/shared.dart';
 import 'package:logging/logging.dart';
@@ -35,31 +34,6 @@ class NotificationUtil {
     if (firebaseToken == null) {
       await Firebase.initializeApp();
       debug = Debug();
-      // AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      //   print("awesome notifciation allowed? $isAllowed");
-      //   if (!isAllowed) {
-      //     AwesomeNotifications().requestPermissionToSendNotifications();
-      //   }
-      // });
-      // await Firebase.initializeApp();
-      // AwesomeNotifications().createdStream.listen((receivedNotification) {
-      //   String? createdSourceText =
-      //   AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
-      //   print('$createdSourceText notification created');
-      // });
-      // await Firebase.initializeApp();
-      // AwesomeNotifications().displayedStream.listen((receivedNotification) {
-      //   String? createdSourceText =
-      //   AssertUtils.toSimpleEnumString(receivedNotification.createdSource);
-      //   print('$createdSourceText notification displayed');
-      // });
-      // await Firebase.initializeApp();
-      // AwesomeNotifications().dismissedStream.listen((receivedAction) {
-      //   String? dismissedSourceText = AssertUtils.toSimpleEnumString(
-      //       receivedAction.dismissedLifeCycle);
-      //   print('Notification dismissed on $dismissedSourceText');
-      // });
-
       await initializeFirebaseService();
       this.screen.update();
     }
@@ -75,17 +49,17 @@ class NotificationUtil {
     }
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      // open message when the app is in the foreground.
       print('A new onMessage event was published!');
       print("message: $message");
     });
 
-    //When the app is in the background, but not terminated.
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      // open message when the app is in the background, but not terminated.
       print('A new onMessageOpenedApp event was published!');
       print("message: $message");
     });
 
-    // ios, wow!
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       // open message when app is terminated
       print("we have clicked on the message I think");
@@ -130,19 +104,6 @@ class NotificationUtil {
     return this.firebaseToken;
   }
 
-  // @override
-  // void dispose() {
-  //   print("disposing the notification util");
-  //   AwesomeNotifications().createdSink.close();
-  //   AwesomeNotifications().displayedSink.close();
-  //   AwesomeNotifications().actionSink.close();
-  // }
-
-  // Future<bool> redirectToPermissionsPage() async {
-  //   await AwesomeNotifications().showNotificationConfigPage();
-  //   return await AwesomeNotifications().isNotificationAllowed();
-  // }
-
   void firebaseBackgroundInitialization() async {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -182,17 +143,3 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     });
   });
 }
-
-//
-// Future<void> showCustomSoundNotification(String title, String body, var data) async {
-//   await AwesomeNotifications().createNotification(
-//       content: NotificationContent(
-//           id: 6,
-//           channelKey: "custom_sound",
-//           title: title,
-//           body: body,
-//           color: Color(int.parse("0xFF039BE5")),
-//           payload: {
-//             'data': data
-//           }));
-// }
