@@ -35,9 +35,9 @@ class NotificationUtil {
     //Initialization Settings for iOS devices
     final IOSInitializationSettings initializationSettingsIOS =
     IOSInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
     );
 
     //InitializationSettings for initializing settings for both platforms (Android & iOS)
@@ -111,8 +111,7 @@ class NotificationUtil {
               presentBadge: true,
               presentSound: true,
               badgeNumber: 0,
-              subtitle: "subtitle",
-              threadIdentifier: "threadIdentifier"
+              sound: "res_brodio.aiff"
           ));
 
       this.screen.update();
