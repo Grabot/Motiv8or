@@ -52,6 +52,7 @@ dev_dependencies:
   http: ^0.13.4
   shared_preferences: ^2.0.8
   awesome_notifications: ^0.6.16
+  logging: ^1.0.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
