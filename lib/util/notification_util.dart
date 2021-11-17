@@ -83,6 +83,7 @@ class NotificationUtil {
       showCustomSoundNotification(title!, body!, data);
     });
     await Firebase.initializeApp();
+    // not on ios
     AwesomeNotifications().actionStream.listen((ReceivedNotification receivedNotification) {
       // notification when the user has the app opened
       // It receives it via firebase messaging and creates a notification
@@ -95,18 +96,31 @@ class NotificationUtil {
       sendDebugString("foreground:   ", receivedNotification.title, receivedNotification.body, receivedNotification.payload.toString());
     });
     await Firebase.initializeApp();
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      // When the app is closed and the user receives a notification
-      // and the user clicks on the notification. This function is called.
+    // not on ios
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    //   // When the app is closed and the user receives a notification
+    //   // and the user clicks on the notification. This function is called.
+    //   print("clicked notification when app closed");
+    //   print("notification: ${message.notification}");
+    //   print("title: ${message.notification!.title}");
+    //   print("body: ${message.notification!.body}");
+    //   print("data: ${message.data}");
+    //   sendDebugString("background:   ", message.notification!.title, message.notification!.body, message.data.toString());
+    // });
+
+    //When the app is in the background, but not terminated.
+    FirebaseMessaging.onMessageOpenedApp.listen((event) {
       print("clicked notification when app closed");
-      print("notification: ${message.notification}");
-      print("title: ${message.notification!.title}");
-      print("body: ${message.notification!.body}");
-      print("data: ${message.data}");
-      sendDebugString("background:   ", message.notification!.title, message.notification!.body, message.data.toString());
-    });
+      print("event $event");
+    },
+      cancelOnError: false,
+      onDone: () {},
+    );
+
     await Firebase.initializeApp();
+    // ios, wow!
     FirebaseMessaging.instance.getInitialMessage().then((message) {
+      // open message when app is terminated
       print("we have clicked on the message I think");
       print("message: $message");
     });
@@ -176,6 +190,7 @@ class NotificationUtil {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // not on ios
   String? title = message.notification!.title;
   String? body = message.notification!.body;
   String data = message.data.toString();
