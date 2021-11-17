@@ -35,9 +35,9 @@ class NotificationUtil {
     //Initialization Settings for iOS devices
     final IOSInitializationSettings initializationSettingsIOS =
     IOSInitializationSettings(
-      requestSoundPermission: false,
-      requestBadgePermission: false,
-      requestAlertPermission: false,
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
     );
 
     //InitializationSettings for initializing settings for both platforms (Android & iOS)
