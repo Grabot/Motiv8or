@@ -7,6 +7,9 @@ import 'package:logging/logging.dart';
 import 'package:notification_permissions/notification_permissions.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+const String androidChannelId = "custom_sound";
+const String androidChannelName = "Brocast notification";
+const String androidChannelDescription = "Custom Bro Sound for notifications";
 
 class NotificationUtil {
 
@@ -15,45 +18,46 @@ class NotificationUtil {
   String? firebaseToken;
   var screen;
 
-  Debug? debug = null;
+  Debug? debug;
+
 
   Map<String, String> channelMap = {
-    "id": "custom_sound",
-    "name": "Brocast notification",
-    "description": "Custom Bro Sound for notifications"
+    "id": androidChannelId,
+    "name": androidChannelName,
+    "description": androidChannelDescription
   };
 
-  static const MethodChannel _channel = MethodChannel('nl.motivator.motivator/channel_bro');
+  static const MethodChannel _channel
+            = MethodChannel('nl.motivator.motivator/channel_bro');
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin
+            = FlutterLocalNotificationsPlugin();
   late NotificationDetails platformChannelSpecifics;
 
-  Future<void> init() async {
-    final AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('res_bro_icon');
+  Future<void> initializeLocalNotifications() async {
+    const AndroidInitializationSettings androidSettings
+              = AndroidInitializationSettings('res_bro_icon');
 
-    //Initialization Settings for iOS devices
-    final IOSInitializationSettings initializationSettingsIOS =
-    IOSInitializationSettings(
-      requestSoundPermission: false,
-      requestBadgePermission: false,
-      requestAlertPermission: false,
+    const IOSInitializationSettings iosSettings = IOSInitializationSettings(
+        requestSoundPermission: false,
+        requestBadgePermission: false,
+        requestAlertPermission: false
     );
 
-    //InitializationSettings for initializing settings for both platforms (Android & iOS)
-    final InitializationSettings initializationSettings =
-    InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: initializationSettingsIOS);
+    const InitializationSettings initSettings = InitializationSettings(
+        android: androidSettings,
+        iOS: iosSettings
+    );
 
     await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
+        initSettings,
         onSelectNotification: selectNotification
     );
   }
 
   void selectNotification(String? payload) {
-    print("selected the notificatoins");
+    print("selected the notification");
+    print("payload $payload");
   }
 
   void requestIOSPermissions() {
@@ -85,23 +89,23 @@ class NotificationUtil {
     if (firebaseToken == null) {
       await Firebase.initializeApp();
       debug = Debug();
-      await initializeFirebaseService();
+      initializeLocalNotifications();
+      initializeFirebaseService();
 
       createNotificationChannel();
 
-      // show the dialog/open settings screen
       NotificationPermissions.requestNotificationPermissions(
           iosSettings: const NotificationSettingsIos(
               sound: true, badge: true, alert: true))
           .then((_) {
-        // when finished, check the permission status
         print("notifications allowed");
       });
 
-      platformChannelSpecifics = NotificationDetails(
+      platformChannelSpecifics = const NotificationDetails(
           android: AndroidNotificationDetails(
-            'custom_sound',
-            'Brocast notification',
+            androidChannelId,
+            androidChannelName,
+            channelDescription: androidChannelDescription,
             playSound: true,
             priority: Priority.high,
             importance: Importance.high,
@@ -114,7 +118,6 @@ class NotificationUtil {
               sound: "res_brodio.aiff"
           ));
 
-      this.screen.update();
     }
   }
 
@@ -129,6 +132,7 @@ class NotificationUtil {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // open message when the app is in the foreground.
+      // Here we create a notification for both android and ios
       print('A new onMessage event was published!');
       print("message: $message");
       _showNotification();
@@ -145,7 +149,7 @@ class NotificationUtil {
       print("we have clicked on the message I think");
       print("message: $message");
     });
-
+    screen.updateFirebaseToken(firebaseToken);
   }
 
   createNotificationChannel() async {
@@ -190,19 +194,12 @@ class NotificationUtil {
   }
 
   getFirebaseToken() {
-    return this.firebaseToken;
+    return firebaseToken;
   }
 
   void firebaseBackgroundInitialization() async {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    // await FirebaseMessaging.instance
-    //     .setForegroundNotificationPresentationOptions(
-    //   alert: true,
-    //   badge: true,
-    //   sound: true,
-    // );
   }
 
   Future<void> _showNotification() async {
@@ -213,6 +210,10 @@ class NotificationUtil {
       platformChannelSpecifics,
       payload: 'Notification Payload',
     );
+  }
+
+  void showNotification() {
+    _showNotification();
   }
 }
 

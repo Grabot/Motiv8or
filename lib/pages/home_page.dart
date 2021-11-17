@@ -5,6 +5,8 @@ import 'package:motivator/pages/page_2.dart';
 import 'package:motivator/pages/page_3.dart';
 import 'package:motivator/pages/page_4.dart';
 import 'package:motivator/util/notification_util.dart';
+import 'package:app_settings/app_settings.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -24,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     notificationUtil = NotificationUtil();
     notificationUtil.initialize(this);
-
+    notificationUtil.requestIOSPermissions();
     super.initState();
   }
 
@@ -43,31 +45,29 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
-                  // showCustomSoundNotification("custom title", "custom body", "");
+                  notificationUtil.showNotification();
                 },
                 child: const Text("click here for sound notification!")
             ),
             SizedBox(height: 30),
-            TextButton(
+            ElevatedButton(
                 onPressed: () {
                   notificationUtil.sendFirebaseToken();
                 },
                 child: const Text("send the firebase token!")
             ),
             SizedBox(height:10),
-            TextButton(
-              onPressed: () {
-                // notificationUtil.redirectToPermissionsPage();
-              },
-              child: Text("open the notification permission page")
+            ElevatedButton(
+                onPressed: AppSettings.openNotificationSettings,
+                child: Text('Open notification Settings'),
             ),
             Row(
               children: [
                 Container(
                   width: MediaQuery.of(context).size.width/4,
-                  child: TextButton(
+                  child: ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacement(
                             context, MaterialPageRoute(builder: (context) => const PageOne()));
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width/4,
-                  child: TextButton(
+                  child: ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacement(
                             context, MaterialPageRoute(builder: (context) => const PageTwo()));
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width/4,
-                  child: TextButton(
+                  child: ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacement(
                             context, MaterialPageRoute(builder: (context) => const PageThree()));
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width/4,
-                  child: TextButton(
+                  child: ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacement(
                             context, MaterialPageRoute(builder: (context) => const PageFour()));
@@ -117,9 +117,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  update() {
+  updateFirebaseToken(String firebaseToken) {
     setState(() {
-      firebaseToken = notificationUtil.getFirebaseToken();
+      this.firebaseToken = firebaseToken;
     });
   }
 }

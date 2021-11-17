@@ -6,10 +6,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   NotificationUtil notificationUtil = NotificationUtil();
-
-  await notificationUtil.init();
-  notificationUtil.requestIOSPermissions();
-
   notificationUtil.firebaseBackgroundInitialization();
 
   runApp(const MyApp());

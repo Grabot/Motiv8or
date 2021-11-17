@@ -53,6 +53,7 @@ dev_dependencies:
   shared_preferences: ^2.0.8
   notification_permissions: ^0.6.1
   flutter_local_notifications: ^9.1.2
+  app_settings: 4.1.1
   logging: ^1.0.2
 
 # For information on the generic Dart part of this file, see the
