@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:motivator/services/debug.dart';
 import 'package:motivator/util/shared.dart';
 import 'package:logging/logging.dart';
+import 'package:motivator/util/storage.dart';
 import 'package:notification_permissions/notification_permissions.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -15,11 +16,16 @@ class NotificationUtil {
 
   static final NotificationUtil _instance = NotificationUtil._internal();
 
+  NotificationUtil._internal();
+
+  factory NotificationUtil() {
+    return _instance;
+  }
+
   String? firebaseToken;
   var screen;
 
   Debug? debug;
-
 
   Map<String, String> channelMap = {
     "id": androidChannelId,
@@ -71,13 +77,6 @@ class NotificationUtil {
     );
   }
 
-
-  factory NotificationUtil() {
-    return _instance;
-  }
-
-  NotificationUtil._internal();
-
   initialize(var screen) async {
     this.screen = screen;
 
@@ -117,7 +116,6 @@ class NotificationUtil {
               badgeNumber: 0,
               sound: "res_brodio.aiff"
           ));
-
     }
   }
 
@@ -133,6 +131,7 @@ class NotificationUtil {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // open message when the app is in the foreground.
       // Here we create a notification for both android and ios
+      Storage storage = Storage();
       print('A new onMessage event was published!');
       print("message: $message");
       _showNotification();
@@ -140,12 +139,14 @@ class NotificationUtil {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       // open message when the app is in the background, but not terminated.
+      Storage storage = Storage();
       print('A new onMessageOpenedApp event was published!');
       print("message: $message");
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       // open message when app is terminated
+      Storage storage = Storage();
       print("we have clicked on the message I think");
       print("message: $message");
     });
@@ -172,8 +173,8 @@ class NotificationUtil {
     });
   }
 
-  sendDebugString(String notificationDetail, String? title, String? body, String data) {
-    String sendString = notificationDetail;
+  sendDebugString(String notify, String? title, String? body, String data) {
+    String sendString = notify;
     sendString = sendString + "   title $title";
     sendString = sendString + "   body $body";
     sendString = sendString + "   data $data";
