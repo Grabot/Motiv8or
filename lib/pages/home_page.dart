@@ -37,12 +37,7 @@ class _HomePageState extends State<HomePage> {
     notificationUtil = NotificationUtil();
     notificationUtil.initialize(this);
     notificationUtil.requestIOSPermissions();
-    BroBros? broToGo = notificationUtil.getBro();
-    if (broToGo != null) {
-      print("we have to go!");
-    } else {
-      print("we can stay here.");
-    }
+    
     // index start at 0 but we will process it from 1,
     // we add five entries because we want to make the id match the index
     // This is not the way you should do it, but this is just for testing.

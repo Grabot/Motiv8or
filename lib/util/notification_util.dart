@@ -1,16 +1,16 @@
-import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:motivator/objects/bro_bros.dart';
-import 'package:motivator/pages/home_page.dart';
+import 'package:motivator/constants/route_paths.dart' as routes;
 import 'package:motivator/services/debug.dart';
+import 'package:motivator/services/navigation_service.dart';
 import 'package:motivator/util/shared.dart';
 import 'package:logging/logging.dart';
 import 'package:motivator/util/storage.dart';
 import 'package:notification_permissions/notification_permissions.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import 'locator.dart';
 
 const String androidChannelId = "custom_sound";
 const String androidChannelName = "Brocast notification";
@@ -19,8 +19,7 @@ const String androidChannelDescription = "Custom Bro Sound for notifications";
 class NotificationUtil {
 
   static final NotificationUtil _instance = NotificationUtil._internal();
-
-  BroBros? bro = null;
+  final NavigationService _navigationService = locator<NavigationService>();
 
   NotificationUtil._internal();
 
@@ -86,7 +85,6 @@ class NotificationUtil {
 
   initialize(var screen) async {
     this.screen = screen;
-    this.bro = null;
 
     storage ??= Storage();
 
@@ -159,7 +157,7 @@ class NotificationUtil {
       int broId = int.parse(data["id"]);
       storage.selectBroBros(broId).then((value) {
         if (value != null) {
-          this.bro = value;
+          _navigationService.navigateTo(routes.BroRoute, arguments: value);
         }
       });
       print('A new onMessageOpenedApp event was published!');
@@ -182,10 +180,6 @@ class NotificationUtil {
     } on PlatformException catch (e) {
       print(e);
     }
-  }
-
-  getBro() {
-    return this.bro;
   }
 
   sendFirebaseToken() {
