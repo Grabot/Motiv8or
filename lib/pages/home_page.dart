@@ -1,10 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:motivator/objects/bro_bros.dart';
-import 'package:motivator/pages/page_1.dart';
-import 'package:motivator/pages/page_2.dart';
-import 'package:motivator/pages/page_3.dart';
-import 'package:motivator/pages/page_4.dart';
+import 'package:motivator/pages/bro_page.dart';
 import 'package:motivator/services/socket_service.dart';
 import 'package:motivator/util/notification_util.dart';
 import 'package:app_settings/app_settings.dart';
@@ -19,7 +16,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   String? firebaseToken = "";
+  String? debugCode = "";
 
   late NotificationUtil notificationUtil;
   late SocketService socket;
@@ -27,16 +26,21 @@ class _HomePageState extends State<HomePage> {
 
   bool isAllowed = false;
 
-  bool bro1Added = false;
-  bool bro2Added = false;
-  bool bro3Added = false;
-  bool bro4Added = false;
+  List<bool> broAdded = [];
 
   @override
   void initState() {
     notificationUtil = NotificationUtil();
     notificationUtil.initialize(this);
     notificationUtil.requestIOSPermissions();
+    // index start at 0 but we will process it from 1,
+    // we add five entries because we want to make the id match the index
+    // This is not the way you should do it, but this is just for testing.
+    broAdded.add(false);
+    broAdded.add(false);
+    broAdded.add(false);
+    broAdded.add(false);
+    broAdded.add(false);
 
     firebaseToken = notificationUtil.getFirebaseToken();
 
@@ -44,33 +48,12 @@ class _HomePageState extends State<HomePage> {
 
     storage = Storage();
     storage.database.then((value) {
-      storage.selectBroBros(1).then((value) {
-        if (value != null) {
-          setState(() {
-            bro1Added = true;
-          });
+      storage.fetchAllBroBros().then((value) {
+        for (BroBros bro in value) {
+          broAdded[bro.id] = true;
         }
-      });
-      storage.selectBroBros(2).then((value) {
-        if (value != null) {
-          setState(() {
-            bro2Added = true;
-          });
-        }
-      });
-      storage.selectBroBros(3).then((value) {
-        if (value != null) {
-          setState(() {
-            bro3Added = true;
-          });
-        }
-      });
-      storage.selectBroBros(4).then((value) {
-        if (value != null) {
-          setState(() {
-            bro4Added = true;
-          });
-        }
+        setState(() {
+        });
       });
     });
 
@@ -116,8 +99,16 @@ class _HomePageState extends State<HomePage> {
                   width: MediaQuery.of(context).size.width/4,
                   child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => const PageOne()));
+                        storage.selectBroBros(1).then((value) {
+                          if (value != null) {
+                            Navigator.pushReplacement(
+                                context, MaterialPageRoute(builder: (context) => BroPage(bro: value)));
+                          } else {
+                            setState(() {
+                              debugCode = "Bro 1 is not added";
+                            });
+                          }
+                        });
                       },
                       child: const Text("Page 1")
                   ),
@@ -126,8 +117,16 @@ class _HomePageState extends State<HomePage> {
                   width: MediaQuery.of(context).size.width/4,
                   child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => const PageTwo()));
+                        storage.selectBroBros(2).then((value) {
+                          if (value != null) {
+                            Navigator.pushReplacement(
+                                context, MaterialPageRoute(builder: (context) => BroPage(bro: value)));
+                          } else {
+                            setState(() {
+                              debugCode = "Bro 2 is not added";
+                            });
+                          }
+                        });
                       },
                       child: const Text("Page 2")
                   ),
@@ -136,8 +135,16 @@ class _HomePageState extends State<HomePage> {
                   width: MediaQuery.of(context).size.width/4,
                   child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => const PageThree()));
+                        storage.selectBroBros(3).then((value) {
+                          if (value != null) {
+                            Navigator.pushReplacement(
+                                context, MaterialPageRoute(builder: (context) => BroPage(bro: value)));
+                          } else {
+                            setState(() {
+                              debugCode = "Bro 3 is not added";
+                            });
+                          }
+                        });
                       },
                       child: const Text("Page 3")
                   ),
@@ -146,8 +153,16 @@ class _HomePageState extends State<HomePage> {
                   width: MediaQuery.of(context).size.width/4,
                   child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => const PageFour()));
+                        storage.selectBroBros(4).then((value) {
+                          if (value != null) {
+                            Navigator.pushReplacement(
+                                context, MaterialPageRoute(builder: (context) => BroPage(bro: value)));
+                          } else {
+                            setState(() {
+                              debugCode = "Bro 4 is not added";
+                            });
+                          }
+                        });
                       },
                       child: const Text("Page 4")
                   ),
@@ -159,7 +174,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Container(
                   width: MediaQuery.of(context).size.width/4,
-                  color: bro1Added ? Colors.green : Colors.red,
+                  color: broAdded[1] ? Colors.green : Colors.red,
                   child: ElevatedButton(
                       onPressed: () {
                         BroBros broBros1 = BroBros(
@@ -179,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                           storage.selectBroBros(1).then((value) {
                             if (value != null) {
                               setState(() {
-                                bro1Added = true;
+                                broAdded[1] = true;
                               });
                             }
                           });
@@ -190,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width/4,
-                  color: bro2Added ? Colors.green : Colors.red,
+                  color: broAdded[2] ? Colors.green : Colors.red,
                   child: ElevatedButton(
                       onPressed: () {
                         BroBros broBros2 = BroBros(
@@ -210,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                           storage.selectBroBros(2).then((value) {
                             if (value != null) {
                               setState(() {
-                                bro2Added = true;
+                                broAdded[2] = true;
                               });
                             }
                           });
@@ -221,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width/4,
-                  color: bro3Added ? Colors.green : Colors.red,
+                  color: broAdded[3] ? Colors.green : Colors.red,
                   child: ElevatedButton(
                       onPressed: () {
                         BroBros broBros3 = BroBros(
@@ -241,7 +256,7 @@ class _HomePageState extends State<HomePage> {
                           storage.selectBroBros(3).then((value) {
                             if (value != null) {
                               setState(() {
-                                bro3Added = true;
+                                broAdded[3] = true;
                               });
                             }
                           });
@@ -252,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width/4,
-                  color: bro4Added ? Colors.green : Colors.red,
+                  color: broAdded[4] ? Colors.green : Colors.red,
                   child: ElevatedButton(
                       onPressed: () {
                         BroBros broBros4 = BroBros(
@@ -272,7 +287,7 @@ class _HomePageState extends State<HomePage> {
                           storage.selectBroBros(4).then((value) {
                             if (value != null) {
                               setState(() {
-                                bro4Added = true;
+                                broAdded[5] = true;
                               });
                             }
                           });
@@ -286,6 +301,9 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 30),
             Text(
               'firebase token: \n$firebaseToken',
+            ),
+            Text(
+              'possible debug code: \n$debugCode',
             ),
           ],
         ),
