@@ -21,7 +21,13 @@ class NotificationUtil {
   static final NotificationUtil _instance = NotificationUtil._internal();
   final NavigationService _navigationService = locator<NavigationService>();
 
-  NotificationUtil._internal();
+  NotificationUtil._internal() {
+    storage ??= Storage();
+
+    if (firebaseToken == null) {
+      setupFirebase();
+    }
+  }
 
   factory NotificationUtil() {
     return _instance;
@@ -86,45 +92,44 @@ class NotificationUtil {
   initialize(var screen) async {
     this.screen = screen;
 
-    storage ??= Storage();
-
     Logger.root.level = Level.SEVERE;
     Logger.root.onRecord.listen((record) {
       print('${record.level.name}: ${record.time}: ${record.message}');
     });
 
-    if (firebaseToken == null) {
-      await Firebase.initializeApp();
-      debug = Debug();
-      initializeLocalNotifications();
-      initializeFirebaseService();
+  }
 
-      createNotificationChannel();
+  setupFirebase() async {
+    await Firebase.initializeApp();
+    debug = Debug();
+    initializeLocalNotifications();
+    initializeFirebaseService();
 
-      NotificationPermissions.requestNotificationPermissions(
-          iosSettings: const NotificationSettingsIos(
-              sound: true, badge: true, alert: true))
-          .then((_) {
-        print("notifications allowed");
-      });
+    createNotificationChannel();
 
-      platformChannelSpecifics = const NotificationDetails(
-          android: AndroidNotificationDetails(
-            androidChannelId,
-            androidChannelName,
-            channelDescription: androidChannelDescription,
-            playSound: true,
-            priority: Priority.high,
-            importance: Importance.high,
-          ),
-          iOS: IOSNotificationDetails(
-              presentAlert: true,
-              presentBadge: true,
-              presentSound: true,
-              badgeNumber: 0,
-              sound: "res_brodio.aiff"
-          ));
-    }
+    NotificationPermissions.requestNotificationPermissions(
+        iosSettings: const NotificationSettingsIos(
+            sound: true, badge: true, alert: true))
+        .then((_) {
+      print("notifications allowed");
+    });
+
+    platformChannelSpecifics = const NotificationDetails(
+        android: AndroidNotificationDetails(
+          androidChannelId,
+          androidChannelName,
+          channelDescription: androidChannelDescription,
+          playSound: true,
+          priority: Priority.high,
+          importance: Importance.high,
+        ),
+        iOS: IOSNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+            badgeNumber: 0,
+            sound: "res_brodio.aiff"
+        ));
   }
 
   Future<void> initializeFirebaseService() async {
@@ -155,20 +160,36 @@ class NotificationUtil {
       print("message data $data");
       print(data["id"]);
       int broId = int.parse(data["id"]);
+      print('A new onMessageOpenedApp event was published!');
+      print("message: $message");
       storage.selectBroBros(broId).then((value) {
         if (value != null) {
           _navigationService.navigateTo(routes.BroRoute, arguments: value);
         }
       });
-      print('A new onMessageOpenedApp event was published!');
-      print("message: $message");
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((message) {
-      // open message when app is terminated
-      Storage storage = Storage();
-      print("we have clicked on the message I think");
+      if (message == null) {
+        return;
+      }
+
+      String? title = message.notification!.title;
+      String? body = message.notification!.body;
+      var data = message.data;
+      print("message title $title");
+      print("message body $body");
+      print("message data $data");
+      print(data["id"]);
+      int broId = int.parse(data["id"]);
+      print('A new onMessageOpenedApp event was published!');
       print("message: $message");
+
+      storage.selectBroBros(broId).then((value) {
+        if (value != null) {
+          _navigationService.navigateTo(routes.BroRoute, arguments: value);
+        }
+      });
     });
     screen.updateFirebaseToken(firebaseToken);
   }
