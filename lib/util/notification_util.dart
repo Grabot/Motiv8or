@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:motivator/objects/bro_bros.dart';
+import 'package:motivator/pages/home_page.dart';
 import 'package:motivator/services/debug.dart';
 import 'package:motivator/util/shared.dart';
 import 'package:logging/logging.dart';
@@ -16,6 +20,8 @@ class NotificationUtil {
 
   static final NotificationUtil _instance = NotificationUtil._internal();
 
+  BroBros? bro = null;
+
   NotificationUtil._internal();
 
   factory NotificationUtil() {
@@ -24,6 +30,7 @@ class NotificationUtil {
 
   String? firebaseToken;
   var screen;
+  var storage;
 
   Debug? debug;
 
@@ -79,6 +86,9 @@ class NotificationUtil {
 
   initialize(var screen) async {
     this.screen = screen;
+    this.bro = null;
+
+    storage ??= Storage();
 
     Logger.root.level = Level.SEVERE;
     Logger.root.onRecord.listen((record) {
@@ -131,7 +141,7 @@ class NotificationUtil {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // open message when the app is in the foreground.
       // Here we create a notification for both android and ios
-      Storage storage = Storage();
+      // So no action is taken, except creating a notifciation
       print('A new onMessage event was published!');
       print("message: $message");
       _showNotification();
@@ -139,7 +149,19 @@ class NotificationUtil {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       // open message when the app is in the background, but not terminated.
-      Storage storage = Storage();
+      String? title = message.notification!.title;
+      String? body = message.notification!.body;
+      var data = message.data;
+      print("message title $title");
+      print("message body $body");
+      print("message data $data");
+      print(data["id"]);
+      int broId = int.parse(data["id"]);
+      storage.selectBroBros(broId).then((value) {
+        if (value != null) {
+          this.bro = value;
+        }
+      });
       print('A new onMessageOpenedApp event was published!');
       print("message: $message");
     });
@@ -160,6 +182,10 @@ class NotificationUtil {
     } on PlatformException catch (e) {
       print(e);
     }
+  }
+
+  getBro() {
+    return this.bro;
   }
 
   sendFirebaseToken() {

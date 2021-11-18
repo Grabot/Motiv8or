@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:motivator/pages/home_page.dart';
+import 'package:motivator/services/navigation_service.dart';
+import 'package:motivator/util/locator.dart';
 import 'package:motivator/util/notification_util.dart';
+import 'package:motivator/constants/route_paths.dart' as routes;
+import 'package:motivator/router.dart' as router;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  setupLocator();
 
   NotificationUtil notificationUtil = NotificationUtil();
   notificationUtil.firebaseBackgroundInitialization();
@@ -21,6 +27,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      initialRoute: routes.HomeRoute,
+      onGenerateRoute: router.generateRoute,
+      navigatorKey: locator<NavigationService>().navigatorKey,
       home: const HomePage(),
     );
   }

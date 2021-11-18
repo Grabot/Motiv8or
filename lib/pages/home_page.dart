@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:motivator/objects/bro_bros.dart';
-import 'package:motivator/pages/bro_page.dart';
-import 'package:motivator/services/socket_service.dart';
+import 'package:motivator/services/navigation_service.dart';
+import 'package:motivator/util/locator.dart';
+import 'package:motivator/constants/route_paths.dart' as routes;
+import 'package:motivator/util/socket_util.dart';
 import 'package:motivator/util/notification_util.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:motivator/util/storage.dart';
@@ -17,11 +19,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  final NavigationService _navigationService = locator<NavigationService>();
+
   String? firebaseToken = "";
   String? debugCode = "";
 
   late NotificationUtil notificationUtil;
-  late SocketService socket;
+  late SocketUtil socket;
   late Storage storage;
 
   bool isAllowed = false;
@@ -33,6 +37,12 @@ class _HomePageState extends State<HomePage> {
     notificationUtil = NotificationUtil();
     notificationUtil.initialize(this);
     notificationUtil.requestIOSPermissions();
+    BroBros? broToGo = notificationUtil.getBro();
+    if (broToGo != null) {
+      print("we have to go!");
+    } else {
+      print("we can stay here.");
+    }
     // index start at 0 but we will process it from 1,
     // we add five entries because we want to make the id match the index
     // This is not the way you should do it, but this is just for testing.
@@ -44,7 +54,7 @@ class _HomePageState extends State<HomePage> {
 
     firebaseToken = notificationUtil.getFirebaseToken();
 
-    socket = SocketService();
+    socket = SocketUtil();
 
     storage = Storage();
     storage.database.then((value) {
@@ -101,8 +111,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         storage.selectBroBros(1).then((value) {
                           if (value != null) {
-                            Navigator.pushReplacement(
-                                context, MaterialPageRoute(builder: (context) => BroPage(bro: value)));
+                            _navigationService.navigateTo(routes.BroRoute, arguments: value);
                           } else {
                             setState(() {
                               debugCode = "Bro 1 is not added";
@@ -119,8 +128,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         storage.selectBroBros(2).then((value) {
                           if (value != null) {
-                            Navigator.pushReplacement(
-                                context, MaterialPageRoute(builder: (context) => BroPage(bro: value)));
+                            _navigationService.navigateTo(routes.BroRoute, arguments: value);
                           } else {
                             setState(() {
                               debugCode = "Bro 2 is not added";
@@ -137,8 +145,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         storage.selectBroBros(3).then((value) {
                           if (value != null) {
-                            Navigator.pushReplacement(
-                                context, MaterialPageRoute(builder: (context) => BroPage(bro: value)));
+                            _navigationService.navigateTo(routes.BroRoute, arguments: value);
                           } else {
                             setState(() {
                               debugCode = "Bro 3 is not added";
@@ -155,8 +162,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         storage.selectBroBros(4).then((value) {
                           if (value != null) {
-                            Navigator.pushReplacement(
-                                context, MaterialPageRoute(builder: (context) => BroPage(bro: value)));
+                            _navigationService.navigateTo(routes.BroRoute, arguments: value);
                           } else {
                             setState(() {
                               debugCode = "Bro 4 is not added";
@@ -287,7 +293,7 @@ class _HomePageState extends State<HomePage> {
                           storage.selectBroBros(4).then((value) {
                             if (value != null) {
                               setState(() {
-                                broAdded[5] = true;
+                                broAdded[4] = true;
                               });
                             }
                           });

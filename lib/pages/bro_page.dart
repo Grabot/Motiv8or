@@ -21,11 +21,14 @@ class BroPage extends StatefulWidget {
 class _BroPageState extends State<BroPage> {
 
   BroBros? bro;
+
   @override
   void initState() {
     NotificationUtil notificationUtil = NotificationUtil();
     notificationUtil.initialize(this);
 
+    print("opened bro page");
+    print(widget.bro);
     this.bro = widget.bro;
 
     super.initState();
@@ -47,7 +50,7 @@ class _BroPageState extends State<BroPage> {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               color: Colors.green,
-              child: Text("This is ${bro!.chatName}  also know as ${bro!.alias}")
+              child: bro == null ? Text("Big error") : Text("This is ${bro!.chatName}  also know as ${bro!.alias}")
             ),
           ),
         )
