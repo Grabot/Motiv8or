@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
@@ -76,6 +78,16 @@ class NotificationUtil {
   void selectNotification(String? payload) {
     print("selected the notification");
     print("payload $payload");
+    print(payload);
+    int broId = int.parse(payload!.split(";")[0]);
+    bool isBroup = int.parse(payload.split(";")[1]) == 1;
+    print(broId);
+    print(isBroup);
+    storage.selectBroBros(broId).then((value) {
+      if (value != null) {
+        _navigationService.navigateTo(routes.BroRoute, arguments: value);
+      }
+    });
   }
 
   void requestIOSPermissions() {
@@ -147,7 +159,15 @@ class NotificationUtil {
       // So no action is taken, except creating a notifciation
       print('A new onMessage event was published!');
       print("message: $message");
-      _showNotification();
+      String? title = message.notification!.title;
+      String? body = message.notification!.body;
+      var data = message.data;
+      print("message title $title");
+      print("message body $body");
+      print("message data $data");
+      print("data? ${data["id"]}");
+      int broId = int.parse(data["id"]);
+      _showNotification(title!, body!, broId);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -244,18 +264,23 @@ class NotificationUtil {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
-  Future<void> _showNotification() async {
+  Future<void> _showNotification(String title, String body, int broId) async {
+
+    print("message title $title");
+    print("message body $body");
+    print("bro id $broId");
+
     await flutterLocalNotificationsPlugin.show(
       0,
-      'Notification Title',
-      'This is the Notification Body',
+      title,
+      body,
       platformChannelSpecifics,
-      payload: 'Notification Payload',
+      payload: broId.toString() + ";" + "0"
     );
   }
 
-  void showNotification() {
-    _showNotification();
+  void showNotification(String title, String body, int broId) {
+    _showNotification(title, body, broId);
   }
 }
 

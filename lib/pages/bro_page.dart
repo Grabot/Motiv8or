@@ -22,6 +22,8 @@ class _BroPageState extends State<BroPage> {
 
   BroBros? bro;
 
+  Color? broColor;
+
   @override
   void initState() {
     NotificationUtil notificationUtil = NotificationUtil();
@@ -31,6 +33,18 @@ class _BroPageState extends State<BroPage> {
     print(widget.bro);
     this.bro = widget.bro;
 
+    broColor = Colors.black;
+    if (this.bro != null) {
+      if (this.bro!.id == 1) {
+        broColor = Colors.green;
+      } else if (this.bro!.id == 2) {
+        broColor = Colors.red;
+      } else if (this.bro!.id == 3) {
+        broColor = Colors.blue;
+      } else if (this.bro!.id == 4) {
+        broColor = Colors.yellow;
+      }
+    }
     super.initState();
   }
 
@@ -49,7 +63,7 @@ class _BroPageState extends State<BroPage> {
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              color: Colors.green,
+              color: broColor,
               child: bro == null ? Text("Big error") : Text("This is ${bro!.chatName}  also know as ${bro!.alias}")
             ),
           ),

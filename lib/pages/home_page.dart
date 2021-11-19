@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             ElevatedButton(
                 onPressed: () {
-                  notificationUtil.showNotification();
+                  notificationUtil.showNotification("notify button", "heey, you pressed the button!", 1);
                 },
                 child: const Text("click here for sound notification!")
             ),
