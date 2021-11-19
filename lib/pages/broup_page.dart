@@ -1,26 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:motivator/objects/bro_bros.dart';
+import 'package:motivator/objects/broup.dart';
 import 'package:motivator/util/notification_util.dart';
 
 import 'home_page.dart';
 
-class BroPage extends StatefulWidget {
+class BroupPage extends StatefulWidget {
 
-  final BroBros? bro;
+  final Broup? broup;
 
-  const BroPage({
+  const BroupPage({
     Key? key,
-    required this.bro
+    required this.broup
   }) : super(key: key);
 
   @override
-  State<BroPage> createState() => _BroPageState();
+  State<BroupPage> createState() => _BroupPageState();
 }
 
-class _BroPageState extends State<BroPage> {
+class _BroupPageState extends State<BroupPage> {
 
-  BroBros? bro;
+  Broup? broup;
 
   Color? broColor;
 
@@ -29,21 +30,15 @@ class _BroPageState extends State<BroPage> {
     NotificationUtil notificationUtil = NotificationUtil();
     notificationUtil.initialize(this);
 
-    print("opened bro page");
-    print(widget.bro);
-    this.bro = widget.bro;
+    print("opened broup page");
+    print(widget.broup);
+    this.broup = widget.broup;
 
     // If there is no bro found the color is black, this should not occur.
     broColor = Colors.black;
-    if (this.bro != null) {
-      if (this.bro!.id == 1) {
+    if (this.broup != null) {
+      if (this.broup!.id == 1) {
         broColor = Colors.green;
-      } else if (this.bro!.id == 2) {
-        broColor = Colors.red;
-      } else if (this.bro!.id == 3) {
-        broColor = Colors.blue;
-      } else if (this.bro!.id == 4) {
-        broColor = Colors.yellow;
       }
     }
     super.initState();
@@ -53,7 +48,7 @@ class _BroPageState extends State<BroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("page of bro"),
+          title: const Text("Here you can chat with a whole broup"),
         ),
         body: Center(
           child: GestureDetector(
@@ -65,7 +60,7 @@ class _BroPageState extends State<BroPage> {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               color: broColor,
-              child: bro == null ? Text("Big error") : Text("This is ${bro!.chatName}  also know as ${bro!.alias}")
+              child: broup == null ? Text("Big error") : Text("This is ${broup!.chatName}  also know as ${broup!.alias}")
             ),
           ),
         )

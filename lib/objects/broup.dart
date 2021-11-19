@@ -1,8 +1,8 @@
 import 'chat.dart';
 
 
-class BroBros extends Chat {
-  BroBros(
+class Broup extends Chat {
+  Broup(
       int id,
       String chatName,
       String chatDescription,
@@ -53,8 +53,7 @@ class BroBros extends Chat {
     return map;
   }
 
-
-  BroBros.fromDbMap(Map<String, dynamic> map) {
+  Broup.fromDbMap(Map<String, dynamic> map) {
     id = map['chatId'];
     chatName = map['chatName'];
     chatDescription = map['chatDescription'];
@@ -67,17 +66,4 @@ class BroBros extends Chat {
     mute = map['mute'];
     isBroup = map['isBroup'];
   }
-
 }
-
-// if (chatColour != null && chatColour != "") {
-//    this.chatColor = Color(int.parse("0xFF$chatColour"));
-// } else {
-//    this.chatColor = null;
-// }
-
-// if (lastActivity != null) {
-//    this.lastActivity = DateTime.parse(lastActivity + 'Z').toLocal();
-// } else {
-//    this.lastActivity = DateTime.now();
-// }

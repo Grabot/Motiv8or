@@ -17,4 +17,7 @@ abstract class Chat {
   Chat();
 
   String getBroNameOrAlias();
+  Map<String, dynamic> toDbMap();
+
+  Chat.fromDbMap(Map<String, dynamic> map);
 }

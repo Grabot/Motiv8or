@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:motivator/objects/bro_bros.dart';
+import 'package:motivator/objects/broup.dart';
+import 'package:motivator/objects/chat.dart';
 import 'package:motivator/services/navigation_service.dart';
 import 'package:motivator/util/locator.dart';
 import 'package:motivator/constants/route_paths.dart' as routes;
@@ -31,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   bool isAllowed = false;
 
   List<bool> broAdded = [];
+  bool broupAdded = false;
 
   @override
   void initState() {
@@ -53,9 +56,16 @@ class _HomePageState extends State<HomePage> {
 
     storage = Storage();
     storage.database.then((value) {
-      storage.fetchAllBroBros().then((value) {
-        for (BroBros bro in value) {
-          broAdded[bro.id] = true;
+      storage.fetchAllChats().then((value) {
+        print("fetched all");
+        print(value);
+        for (Chat chat in value) {
+          if (chat.isBroup == 1) {
+            // We only have one broup as test. If it's in the db set value true.
+            broupAdded = true;
+          } else {
+            broAdded[chat.id] = true;
+          }
         }
         setState(() {
         });
@@ -82,7 +92,7 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             ElevatedButton(
                 onPressed: () {
-                  notificationUtil.showNotification("notify button", "heey, you pressed the button!", 1);
+                  notificationUtil.showNotification("notify button", "heey, you pressed the button!", 1, 0);
                 },
                 child: const Text("click here for sound notification!")
             ),
@@ -104,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                   width: MediaQuery.of(context).size.width/4,
                   child: ElevatedButton(
                       onPressed: () {
-                        storage.selectBroBros(1).then((value) {
+                        storage.selectChat(1, 0).then((value) {
                           if (value != null) {
                             _navigationService.navigateTo(routes.BroRoute, arguments: value);
                           } else {
@@ -121,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                   width: MediaQuery.of(context).size.width/4,
                   child: ElevatedButton(
                       onPressed: () {
-                        storage.selectBroBros(2).then((value) {
+                        storage.selectChat(2, 0).then((value) {
                           if (value != null) {
                             _navigationService.navigateTo(routes.BroRoute, arguments: value);
                           } else {
@@ -138,7 +148,7 @@ class _HomePageState extends State<HomePage> {
                   width: MediaQuery.of(context).size.width/4,
                   child: ElevatedButton(
                       onPressed: () {
-                        storage.selectBroBros(3).then((value) {
+                        storage.selectChat(3, 0).then((value) {
                           if (value != null) {
                             _navigationService.navigateTo(routes.BroRoute, arguments: value);
                           } else {
@@ -155,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                   width: MediaQuery.of(context).size.width/4,
                   child: ElevatedButton(
                       onPressed: () {
-                        storage.selectBroBros(4).then((value) {
+                        storage.selectChat(4, 0).then((value) {
                           if (value != null) {
                             _navigationService.navigateTo(routes.BroRoute, arguments: value);
                           } else {
@@ -191,8 +201,8 @@ class _HomePageState extends State<HomePage> {
                             0,
                             0
                         );
-                        storage.addBroBros(broBros1).then((value) {
-                          storage.selectBroBros(1).then((value) {
+                        storage.addChat(broBros1).then((value) {
+                          storage.selectChat(1, 0).then((value) {
                             if (value != null) {
                               setState(() {
                                 broAdded[1] = true;
@@ -222,8 +232,8 @@ class _HomePageState extends State<HomePage> {
                             0,
                             0
                         );
-                        storage.addBroBros(broBros2).then((value) {
-                          storage.selectBroBros(2).then((value) {
+                        storage.addChat(broBros2).then((value) {
+                          storage.selectChat(2, 0).then((value) {
                             if (value != null) {
                               setState(() {
                                 broAdded[2] = true;
@@ -253,8 +263,8 @@ class _HomePageState extends State<HomePage> {
                             0,
                             0
                         );
-                        storage.addBroBros(broBros3).then((value) {
-                          storage.selectBroBros(3).then((value) {
+                        storage.addChat(broBros3).then((value) {
+                          storage.selectChat(3, 0).then((value) {
                             if (value != null) {
                               setState(() {
                                 broAdded[3] = true;
@@ -284,8 +294,8 @@ class _HomePageState extends State<HomePage> {
                             0,
                             0
                         );
-                        storage.addBroBros(broBros4).then((value) {
-                          storage.selectBroBros(4).then((value) {
+                        storage.addChat(broBros4).then((value) {
+                          storage.selectChat(4, 0).then((value) {
                             if (value != null) {
                               setState(() {
                                 broAdded[4] = true;
@@ -298,6 +308,54 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ],
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width/3,
+              child: ElevatedButton(
+                  onPressed: () {
+                    storage.selectChat(1, 1).then((value) {
+                      if (value != null) {
+                        _navigationService.navigateTo(routes.BroupRoute, arguments: value);
+                      } else {
+                        setState(() {
+                          debugCode = "Broup is not added";
+                        });
+                      }
+                    });
+                  },
+                  child: const Text("Broup Page")
+              ),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width/2,
+              color: broupAdded ? Colors.green : Colors.red,
+              child: ElevatedButton(
+                onPressed: () {
+                  Broup broup = Broup(
+                      1,
+                      "broup",
+                      "the only broup",
+                      "Brocreators",
+                      "0x956789",
+                      0,
+                      "2020120123123",
+                      "broup_1",
+                      0,
+                      0,
+                      1
+                  );
+                  storage.addChat(broup).then((value) {
+                    storage.selectChat(1, 1).then((value) {
+                      if (value != null) {
+                        setState(() {
+                          broupAdded = true;
+                        });
+                      }
+                    });
+                  });
+                },
+                child: const Text("Add the broup")
+              ),
             ),
             SizedBox(height: 30),
             Text(

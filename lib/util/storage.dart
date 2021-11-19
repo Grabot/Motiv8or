@@ -1,10 +1,12 @@
 import 'package:motivator/objects/bro_bros.dart';
+import 'package:motivator/objects/broup.dart';
+import 'package:motivator/objects/chat.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 
 class Storage {
-  static const _dbName = "brocast.db";
+  static const _dbName = "motivator.db";
 
   static final Storage _instance = Storage._internal();
 
@@ -43,8 +45,19 @@ class Storage {
       ) async {
     print("executing query");
     await db.execute('''
-          CREATE TABLE BroBros (
+    CREATE TABLE USER (
             id INTEGER PRIMARY KEY,
+            broName TEXT,
+            bromotion TEXT,
+            password TEXT,
+            token TEXT,
+            registrationId TEXT
+          );
+          ''');
+    await db.execute('''
+          CREATE TABLE Chat (
+            id INTEGER PRIMARY KEY,
+            chatId INTEGER,
             lastActivity TEXT,
             chatName TEXT NOT NULL,
             chatDescription TEXT,
@@ -54,60 +67,71 @@ class Storage {
             unreadMessages INTEGER,
             blocked INTEGER,
             mute INTEGER,
-            isBroup INTEGER
-          )
+            isBroup INTEGER,
+            UNIQUE(chatId, isBroup) ON CONFLICT REPLACE
+          );
           ''');
   }
 
-  Future<int> addBroBros(BroBros broBros) async {
+  Future<int> addChat(Chat chat) async {
     Database database = await this.database;
     return database.insert(
-      'BroBros',
-      broBros.toDbMap(),
+      'Chat',
+      chat.toDbMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<List<BroBros>> fetchAllBroBros() async {
+  Future<List<Chat>> fetchAllChats() async {
     Database database = await this.database;
-    List<Map<String, dynamic>> maps = await database.query('BroBros');
+    List<Map<String, dynamic>> maps = await database.query('Chat');
     if (maps.isNotEmpty) {
-      return maps.map((map) => BroBros.fromDbMap(map)).toList();
+      return maps.map((map) =>
+      map['isBroup'] == 1
+          ? Broup.fromDbMap(map)
+          : BroBros.fromDbMap(map)
+      ).toList();
     }
     return List.empty();
   }
 
-  Future<BroBros?> selectBroBros(int id) async {
-    print("selecting bro");
+  Future<Chat?> selectChat(int chatId, int isBroup) async {
+    // TODO: @Skools add the broup selection
+    print("selecting chat");
     Database database = await this.database;
-    String query = "SELECT * FROM BroBros where id = " + id.toString();
+    String query = "SELECT * FROM Chat where chatId = " + chatId.toString() + " and isBroup = " + isBroup.toString();
     print(query);
-    List<Map<String, dynamic>> bro = await database.rawQuery(query);
-    print(bro);
-    if (bro.length != 1) {
+    List<Map<String, dynamic>> chat = await database.rawQuery(query);
+    print(chat);
+    if (chat.length != 1) {
       return null;
     } else {
-      return BroBros.fromDbMap(bro[0]);
+      if (chat[0]["isBroup"] == 1) {
+        return Broup.fromDbMap(chat[0]);
+      } else {
+        return BroBros.fromDbMap(chat[0]);
+      }
     }
   }
 
-  Future<int> updateBroBros(BroBros broBros) async {
+  Future<int> updateChat(Chat chat) async {
     Database database = await this.database;
     return database.update(
-      'BroBros',
-      broBros.toDbMap(),
-      where: 'id = ?',
-      whereArgs: [broBros.id],
+      'Chat',
+      chat.toDbMap(),
+      where: 'chatId = ?',
+      whereArgs: [chat.id],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<int> deleteBroBros(int id) async {
+  Future<int> deleteChat(int chatId, bool broup) async {
+    // TODO: @SKools test if it works and also add broup bool
     Database database = await this.database;
     return database.delete(
-      'BroBros',
-      where: 'id = ?',
-      whereArgs: [id],
+      'Chat',
+      where: 'chatId = ?',
+      whereArgs: [chatId],
     );
   }
 }

@@ -1,5 +1,6 @@
-import 'dart:convert';
-
+import 'package:motivator/objects/bro_bros.dart';
+import 'package:motivator/objects/broup.dart';
+import 'package:motivator/objects/chat.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
@@ -80,12 +81,25 @@ class NotificationUtil {
     print("payload $payload");
     print(payload);
     int broId = int.parse(payload!.split(";")[0]);
-    bool isBroup = int.parse(payload.split(";")[1]) == 1;
+    int isBroup = int.parse(payload.split(";")[1]);
     print(broId);
     print(isBroup);
-    storage.selectBroBros(broId).then((value) {
+    notificationNavigate(broId, isBroup);
+  }
+
+  void notificationNavigate(int id, int isBroup) {
+    storage.selectChat(id, isBroup).then((value) {
       if (value != null) {
-        _navigationService.navigateTo(routes.BroRoute, arguments: value);
+        Chat chat = value;
+        print("found a chat");
+        print(chat);
+        if (chat.isBroup == 1) {
+          _navigationService.navigateTo(routes.BroupRoute, arguments: value);
+        } else {
+          _navigationService.navigateTo(routes.BroRoute, arguments: value);
+        }
+      } else {
+        _navigationService.navigateTo(routes.HomeRoute);
       }
     });
   }
@@ -166,8 +180,10 @@ class NotificationUtil {
       print("message body $body");
       print("message data $data");
       print("data? ${data["id"]}");
+      print("broup? ${data["broup"]}");
       int broId = int.parse(data["id"]);
-      _showNotification(title!, body!, broId);
+      int isBroup = int.parse(data["broup"]);
+      _showNotification(title!, body!, broId, isBroup);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -180,13 +196,10 @@ class NotificationUtil {
       print("message data $data");
       print(data["id"]);
       int broId = int.parse(data["id"]);
+      int isBroup = int.parse(data["broup"]);
       print('A new onMessageOpenedApp event was published!');
       print("message: $message");
-      storage.selectBroBros(broId).then((value) {
-        if (value != null) {
-          _navigationService.navigateTo(routes.BroRoute, arguments: value);
-        }
-      });
+      notificationNavigate(broId, isBroup);
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((message) {
@@ -202,14 +215,11 @@ class NotificationUtil {
       print("message data $data");
       print(data["id"]);
       int broId = int.parse(data["id"]);
+      int isBroup = int.parse(data["broup"]);
       print('A new onMessageOpenedApp event was published!');
       print("message: $message");
 
-      storage.selectBroBros(broId).then((value) {
-        if (value != null) {
-          _navigationService.navigateTo(routes.BroRoute, arguments: value);
-        }
-      });
+      notificationNavigate(broId, isBroup);
     });
     screen.updateFirebaseToken(firebaseToken);
   }
@@ -264,23 +274,24 @@ class NotificationUtil {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
-  Future<void> _showNotification(String title, String body, int broId) async {
+  Future<void> _showNotification(String title, String body, int broId, int isBroup) async {
 
     print("message title $title");
     print("message body $body");
     print("bro id $broId");
+    print("broup?  $isBroup");
 
     await flutterLocalNotificationsPlugin.show(
       0,
       title,
       body,
       platformChannelSpecifics,
-      payload: broId.toString() + ";" + "0"
+      payload: broId.toString() + ";" + isBroup.toString()
     );
   }
 
-  void showNotification(String title, String body, int broId) {
-    _showNotification(title, body, broId);
+  void showNotification(String title, String body, int broId, int isBroup) {
+    _showNotification(title, body, broId, isBroup);
   }
 }
 
